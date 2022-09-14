@@ -2,9 +2,7 @@ package ru.practicum.repository;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class StatsRepositoryTest {
+class StatsJpaTest {
 
     @Test
     void statsWithUniqueIp() {

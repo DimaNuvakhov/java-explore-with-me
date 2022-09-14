@@ -6,21 +6,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.model.EndpointHit;
-import ru.practicum.service.StatsServiceImpl;
+import ru.practicum.service.StatsService;
 
 @RestController
 @RequestMapping(path = "/hit")
 public class EndpointHitController {
 
-    private final StatsServiceImpl statsServiceImpl;
+    private final StatsService statsService;
 
     @Autowired
-    public EndpointHitController(StatsServiceImpl statsServiceImpl) {
-        this.statsServiceImpl = statsServiceImpl;
+    public EndpointHitController(StatsService statsService) {
+        this.statsService = statsService;
     }
 
     @PostMapping
     public EndpointHit add(@RequestBody EndpointHit endpointHit) {
-        return statsServiceImpl.add(endpointHit);
+        return statsService.add(endpointHit);
     }
 }

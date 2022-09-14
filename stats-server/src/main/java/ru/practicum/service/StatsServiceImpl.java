@@ -32,7 +32,7 @@ public class StatsServiceImpl implements StatsService {
             for (String uri : uris) {
                 if (unique && statsRepository.statsWithUniqueIp(start, end, uri, app) != 0) {
                     stats.add(new ViewStats(app, uri, statsRepository.statsWithUniqueIp(start, end, uri, app)));
-                } else if (!unique && statsRepository.statsWithUniqueIp(start, end, uri, app) != 0) {
+                } else if (!unique && statsRepository.statsWithoutUniqueIp(start, end, uri, app) != 0) {
                     stats.add(new ViewStats(app, uri, statsRepository.statsWithoutUniqueIp(start, end, uri, app)));
                 }
             }
