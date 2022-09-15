@@ -21,25 +21,26 @@ public class CategoryController {
     @GetMapping("/categories")
     public Collection<CategoryDto> getAll(@RequestParam(defaultValue = "0", required = false) Integer from,
                                           @RequestParam(defaultValue = "10", required = false) Integer size) {
-        return null;
+        return categoryService.getAll(from, size);
     }
 
     @GetMapping("/categories/{catId}")
     public CategoryDto getById(@PathVariable Integer catId) {
-        return null;
+        return categoryService.getById(catId);
     }
 
     @PatchMapping("/admin/categories")
     public CategoryDto patch(@RequestBody CategoryDto categoryDto) {
-        return null;
+        return categoryService.patch(categoryDto);
     }
 
     @PostMapping("/admin/categories")
     public CategoryDto post(@RequestBody CategoryDto categoryDto) {
-        return null;
+        return categoryService.post(categoryDto);
     }
 
     @DeleteMapping("/admin/categories/{catId}")
     public void deleteById(@PathVariable Integer catId) {
+        categoryService.deleteById(catId);
     }
 }

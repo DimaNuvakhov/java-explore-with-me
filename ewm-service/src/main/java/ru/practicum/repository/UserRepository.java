@@ -3,10 +3,10 @@ package ru.practicum.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.practicum.model.Category;
+import ru.practicum.model.User;
 
-public interface CategoryRepository extends JpaRepository<Category, Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
-    Page<Category> findAll(Pageable pageable);
+    Page<User> findAll(Pageable pageable);
 
 }
