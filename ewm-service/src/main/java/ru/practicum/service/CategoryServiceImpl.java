@@ -47,7 +47,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto patch(CategoryDto categoryDto) {
-        Category updatedCategory = categoryRepository.findById(categoryDto.getId()).orElse(new Category()); // TODO тут надо будет выбросить исключение
+        Category updatedCategory = categoryRepository.findById(categoryDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Ошибка")); // TODO тут надо будет выбросить исключение
         if (categoryDto.getName() != null) {
             updatedCategory.setName(updatedCategory.getName());
         }

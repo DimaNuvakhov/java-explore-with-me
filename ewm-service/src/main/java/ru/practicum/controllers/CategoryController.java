@@ -1,12 +1,17 @@
 package ru.practicum.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.dto.CategoryDto;
 import ru.practicum.service.interfaces.CategoryService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 
+@Validated
 @RestController
 @RequestMapping()
 public class CategoryController {
@@ -19,8 +24,8 @@ public class CategoryController {
     }
 
     @GetMapping("/categories")
-    public Collection<CategoryDto> getAll(@RequestParam(defaultValue = "0", required = false) Integer from,
-                                          @RequestParam(defaultValue = "10", required = false) Integer size) {
+    public Collection<CategoryDto> getAll(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                          @Positive @RequestParam(defaultValue = "10") Integer size) {
         return categoryService.getAll(from, size);
     }
 
@@ -35,7 +40,7 @@ public class CategoryController {
     }
 
     @PostMapping("/admin/categories")
-    public CategoryDto post(@RequestBody CategoryDto categoryDto) {
+    public CategoryDto post(@RequestBody @Valid CategoryDto categoryDto) {
         return categoryService.post(categoryDto);
     }
 

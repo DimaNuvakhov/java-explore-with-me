@@ -33,7 +33,10 @@ public class UserServiceImpl implements UserService {
         List<UserDto> userDtos = new ArrayList<>();
         if (ids != null) {
             for (Integer id : ids) {
-                userDtos.add(UserMapper.toUserDto(userRepository.findById(id).orElse(new User()))); // TODO Разобраться
+                User newUser = userRepository.findById(id).orElse(new User());
+                if (newUser.getId() != null) {
+                    userDtos.add(UserMapper.toUserDto(newUser)); // TODO Разобраться
+                }
             }
             return userDtos;
         } else {
