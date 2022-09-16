@@ -2,6 +2,7 @@ package ru.practicum.mappers;
 
 import ru.practicum.model.User;
 import ru.practicum.model.dto.UserDto;
+import ru.practicum.model.dto.UserShortDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,4 +25,7 @@ public class UserMapper {
         return userDtos;
     }
 
+    public static UserShortDto toUserShortDto(User user) {
+        return new UserShortDto(user.getId(), user.getName());
+    }
 }

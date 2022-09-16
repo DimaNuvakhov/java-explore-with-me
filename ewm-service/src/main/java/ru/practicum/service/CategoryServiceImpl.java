@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.model.Category;
 import ru.practicum.model.dto.CategoryDto;
@@ -29,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
     @Override
     public List<CategoryDto> getAll(Integer from, Integer size) {
-        PageRequest pageRequest = PageRequest.of(from / size, size);
+        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
         return categoryRepository.findAll(pageRequest).stream()
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
@@ -50,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category updatedCategory = categoryRepository.findById(categoryDto.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Ошибка")); // TODO тут надо будет выбросить исключение
         if (categoryDto.getName() != null) {
-            updatedCategory.setName(updatedCategory.getName());
+            updatedCategory.setName(categoryDto.getName());
         }
         return CategoryMapper.toCategoryDto(categoryRepository.save(updatedCategory));
     }

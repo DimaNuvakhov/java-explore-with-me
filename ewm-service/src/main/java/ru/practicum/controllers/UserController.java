@@ -23,19 +23,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("admin/users")
+    @PostMapping("/admin/users")
     public UserDto post(@RequestBody @Valid UserDto userDto) {
         return userService.post(userDto);
     }
 
-    @GetMapping("admin/users")
-    public Collection<UserDto> getAll(@RequestParam Integer[] ids,
+    @GetMapping("/admin/users")
+    public Collection<UserDto> getAll(@RequestParam(defaultValue = "null", required = false) Integer[] ids,
                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
         return userService.getAll(ids, from, size);
     }
 
-    @DeleteMapping("admin/users/{userId}")
+    @DeleteMapping("/admin/users/{userId}")
     public void deleteById(@PathVariable Integer userId) {
         userService.deleteById(userId);
     }

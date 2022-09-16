@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.mappers.UserMapper;
 import ru.practicum.model.User;
@@ -40,7 +41,7 @@ public class UserServiceImpl implements UserService {
             }
             return userDtos;
         } else {
-            PageRequest pageRequest = PageRequest.of(from / size, size);
+            PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
             return userRepository.findAll(pageRequest).stream()
                     .map(UserMapper::toUserDto)
                     .collect(Collectors.toList());
