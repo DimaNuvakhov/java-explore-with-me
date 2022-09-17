@@ -6,7 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.model.Category;
 import ru.practicum.model.dto.CategoryDto;
-import ru.practicum.mappers.CategoryMapper;
+import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.service.interfaces.CategoryService;
 

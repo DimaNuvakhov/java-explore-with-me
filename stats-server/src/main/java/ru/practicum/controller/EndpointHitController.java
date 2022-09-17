@@ -1,4 +1,4 @@
-package ru.practicum.controllers;
+package ru.practicum.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
