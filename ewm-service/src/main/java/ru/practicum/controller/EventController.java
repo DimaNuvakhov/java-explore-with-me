@@ -7,6 +7,7 @@ import ru.practicum.model.dto.EventFullDto;
 import ru.practicum.model.dto.NewEventDto;
 import ru.practicum.service.interfaces.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @Validated
@@ -21,6 +22,13 @@ public class EventController {
         this.eventService = eventService;
     }
 
+    // Public
+    @GetMapping("/events/{eventId}")
+    public EventFullDto getEventByIdPublic(@PathVariable Integer eventId, HttpServletRequest request) {
+        return eventService.getEventByIdPublic(eventId, request.getRemoteAddr(), request.getRequestURI());
+    }
+
+    //Private
     @PostMapping("/users/{userId}/events")
     public EventFullDto post(@RequestBody @Valid NewEventDto newEventDto, @PathVariable Integer userId) {
         return eventService.post(newEventDto, userId);

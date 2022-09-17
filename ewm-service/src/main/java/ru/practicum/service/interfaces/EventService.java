@@ -9,4 +9,6 @@ public interface EventService {
 
     EventFullDto cancelEvent(Integer userId, Integer eventId);
 
+    EventFullDto getEventByIdPublic(Integer eventId, String ip, String uri);
+
 }

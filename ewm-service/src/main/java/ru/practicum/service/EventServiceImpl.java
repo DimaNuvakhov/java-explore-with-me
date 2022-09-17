@@ -1,7 +1,9 @@
 package ru.practicum.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.practicum.client.EventClient;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.LocationMapper;
 import ru.practicum.model.*;
@@ -26,13 +28,16 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
 
+    private final EventClient eventClient;
+
     @Autowired
     public EventServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
-                            LocationRepository locationRepository, EventRepository eventRepository) {
+                            LocationRepository locationRepository, EventRepository eventRepository, EventClient eventClient) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.locationRepository = locationRepository;
         this.eventRepository = eventRepository;
+        this.eventClient = eventClient;
     }
 
     public EventFullDto post(NewEventDto newEventDto, Integer userId) {
@@ -60,5 +65,16 @@ public class EventServiceImpl implements EventService {
         }
         foundedEvent.setState(State.CANCELED.toString());
         return EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
+    }
+
+    public EventFullDto getEventByIdPublic(Integer eventId, String ip, String uri) {
+        Event foundedEvent = eventRepository.findById(eventId).orElse(new Event()); // TODO Здесь нужно кинуть исключение
+        if (!foundedEvent.getState().equals(State.PUBLISHED.toString())) {
+            // TODO Здесь нужно кинуть исключение
+        }
+        eventClient.postRequest(new EndpointHit(null, "ewn", uri, ip, LocalDateTime.now()));
+        // TODO Доделать!!!
+
+        return null;
     }
 }

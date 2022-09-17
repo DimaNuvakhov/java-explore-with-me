@@ -11,6 +11,7 @@ import ru.practicum.model.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/stats")
@@ -26,7 +27,7 @@ public class StatsController {
     @GetMapping
     public Collection<ViewStats> get(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-                                     @RequestParam String[] uris,
+                                     @RequestParam List<String> uris,
                                      @RequestParam Boolean unique) {
         return statsService.get(start, end, uris, unique);
     }

@@ -20,7 +20,7 @@ class StatsServiceImplTest {
     private EndpointHit endpointHit = new EndpointHit(1, "ewm-service",
             "http://localhost:8080/events/2", "192.168.123.132.", LocalDateTime.now());
     private List<String> apps = List.of("ewm-service", "secondService");
-    private String[] uris = {"http://localhost:8080/events/2"};
+    private List<String> uris = List.of("http://localhost:8080/events/2");
 
     @BeforeEach
     public void beforeEach() {

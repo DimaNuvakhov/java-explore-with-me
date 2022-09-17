@@ -10,6 +10,6 @@ public interface StatsService {
 
     EndpointHit add(EndpointHit endpointHit);
 
-    List<ViewStats> get(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique);
+    List<ViewStats> get(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique);
 
 }

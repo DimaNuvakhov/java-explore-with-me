@@ -40,7 +40,7 @@ class StatsControllerTest {
             new ViewStats("ewm-service", "http://localhost:8080/events/1", 4)
     );
 
-    private String[] uris = {"http://localhost:8080/events/2", "http://localhost:8080/events/1"};
+    private List<String> uris = List.of("http://localhost:8080/events/2", "http://localhost:8080/events/1");
 
     @Test
     void getViewStats() throws Exception {

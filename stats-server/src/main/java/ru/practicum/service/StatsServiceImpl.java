@@ -21,11 +21,11 @@ public class StatsServiceImpl implements StatsService {
     }
 
     public EndpointHit add(EndpointHit endpointHit) {
-        endpointHit.setTimestamp(LocalDateTime.now());
+//        endpointHit.setTimestamp(LocalDateTime.now());
         return statsRepository.save(endpointHit);
     }
 
-    public List<ViewStats> get(LocalDateTime start, LocalDateTime end, String[] uris, Boolean unique) {
+    public List<ViewStats> get(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         List<ViewStats> stats = new ArrayList<>();
         // Тут я полагаю, что помимо нашего основного сервиса возможны и другие
         for (String app : statsRepository.findApp()) {
