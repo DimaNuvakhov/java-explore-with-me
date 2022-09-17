@@ -45,7 +45,7 @@ public class Event {
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
 
-    @Column(name = "published_on", nullable = false)
+    @Column(name = "published_on", nullable = true)
     private LocalDateTime publishedOn;
 
     @Column(name = "request_moderation", nullable = false)
@@ -55,4 +55,26 @@ public class Event {
 
     private String title;
 
+    public Event(Integer id, String annotation, Category category, LocalDateTime createdOn, String description,
+                 LocalDateTime eventDate, User initiator, Location location, Boolean paid, Integer participantLimit,
+                 LocalDateTime publishedOn, Boolean requestModeration, String state, String title) {
+        this.id = id;
+        this.annotation = annotation;
+        this.category = category;
+        this.createdOn = createdOn;
+        this.description = description;
+        this.eventDate = eventDate;
+        this.initiator = initiator;
+        this.location = location;
+        this.paid = paid;
+        this.participantLimit = participantLimit;
+        this.publishedOn = publishedOn;
+        this.requestModeration = requestModeration;
+        this.state = state;
+        this.title = title;
+    }
+
+    public Event() {
+
+    }
 }
