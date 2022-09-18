@@ -3,6 +3,7 @@ package ru.practicum.client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.model.EndpointHit;
@@ -24,11 +25,11 @@ public class EventClient extends BaseClient {
         );
     }
 
-    public Object postRequest(EndpointHit endpointHit) {
+    public ResponseEntity<Object> postRequest(EndpointHit endpointHit) {
         return post("/hit", endpointHit);
     }
 
-    public Object getRequest(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+    public ResponseEntity<Object> getRequest(LocalDateTime start, LocalDateTime end, String uris, Boolean unique) {
         Map<String, Object> parameters = Map.of(
                 "start", start,
                 "end", end,

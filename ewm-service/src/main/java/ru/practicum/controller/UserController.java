@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
+import java.util.List;
 
 @Validated
 @RestController
@@ -29,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/admin/users")
-    public Collection<UserDto> getAll(@RequestParam(defaultValue = "null", required = false) Integer[] ids,
+    public Collection<UserDto> getAll(@RequestParam(defaultValue = "null", required = false) List<Integer> ids,
                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
         return userService.getAll(ids, from, size);

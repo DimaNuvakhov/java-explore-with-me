@@ -8,7 +8,7 @@ public interface UserService {
 
     UserDto post(UserDto userDto);
 
-    List<UserDto> getAll(Integer[] ids, Integer from, Integer size);
+    List<UserDto> getAll(List<Integer> ids, Integer from, Integer size);
 
     void deleteById(Integer userId);
 

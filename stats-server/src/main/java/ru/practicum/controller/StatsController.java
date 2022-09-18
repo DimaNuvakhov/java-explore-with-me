@@ -29,6 +29,10 @@ public class StatsController {
                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
                                      @RequestParam List<String> uris,
                                      @RequestParam Boolean unique) {
+        System.out.println(start);
+        System.out.println(end);
+        System.out.println(uris);
+        System.out.println(unique);
         return statsService.get(start, end, uris, unique);
     }
 }

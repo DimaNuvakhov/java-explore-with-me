@@ -11,4 +11,6 @@ public interface EventService {
 
     EventFullDto getEventByIdPublic(Integer eventId, String ip, String uri);
 
+    EventFullDto publishEvent(Integer eventId);
+
 }

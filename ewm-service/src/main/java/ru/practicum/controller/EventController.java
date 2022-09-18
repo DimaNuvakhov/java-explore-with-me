@@ -39,5 +39,9 @@ public class EventController {
         return eventService.cancelEvent(userId, eventId);
     }
 
-
+    // Admin
+    @PatchMapping("/admin/events/{eventId}/publish")
+    public EventFullDto publishEvent(@PathVariable Integer eventId) {
+        return eventService.publishEvent(eventId);
+    }
 }

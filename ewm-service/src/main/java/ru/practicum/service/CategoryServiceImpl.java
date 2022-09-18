@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.exception.CategoryNotFoundException;
 import ru.practicum.model.Category;
 import ru.practicum.model.dto.CategoryDto;
 import ru.practicum.mapper.CategoryMapper;
@@ -37,19 +38,24 @@ public class CategoryServiceImpl implements CategoryService {
     }
     @Override
     public void deleteById(Integer catId) {
+        if (!categoryRepository.existsById(catId)) {
+            throw new CategoryNotFoundException("Category with id " + catId + " was not found.");
+        }
         categoryRepository.deleteById(catId);
     }
 
     @Override
     public CategoryDto getById(Integer catId) {
-        Category category = categoryRepository.findById(catId).orElse(new Category()); // TODO тут надо будет выбросить исключение
+        Category category = categoryRepository.findById(catId)
+                .orElseThrow(() -> new CategoryNotFoundException("Category with id " + catId + " was not found."));
         return CategoryMapper.toCategoryDto(category);
     }
 
     @Override
     public CategoryDto patch(CategoryDto categoryDto) {
         Category updatedCategory = categoryRepository.findById(categoryDto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Ошибка")); // TODO тут надо будет выбросить исключение
+                .orElseThrow(() -> new CategoryNotFoundException(
+                        "Category with id " + categoryDto.getId() + " was not found."));
         if (categoryDto.getName() != null) {
             updatedCategory.setName(categoryDto.getName());
         }

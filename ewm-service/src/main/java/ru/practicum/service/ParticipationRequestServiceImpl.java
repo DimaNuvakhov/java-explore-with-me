@@ -1,6 +1,8 @@
 package ru.practicum.service;
 
 import org.springframework.stereotype.Service;
+import ru.practicum.exception.EventNotFoundException;
+import ru.practicum.exception.UserNotFoundException;
 import ru.practicum.mapper.ParticipationRequestMapper;
 import ru.practicum.model.Event;
 import ru.practicum.model.State;
@@ -32,11 +34,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     public ParticipationRequestDto post(Integer userId, Integer eventId, ParticipationRequestDto requestDto) {
         if (requestRepository.existsByRequesterAndAndEvent(userId, eventId)) {
-            // TODO Здесь нужно кинуть исключение
+            // TODO нужно кинуть исключение
         }
         requestDto.setCreated(LocalDateTime.now());
-        Event foundedEvent = eventRepository.findById(eventId).orElse(new Event()); // TODO Здесь нужно кинуть исключение
-        User requester = userRepository.findById(userId).orElse(new User()); // TODO Здесь нужно кинуть исключение
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        User requester = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " was not found."));
         if (foundedEvent.getInitiator().getId().equals(requester.getId())) {
             // TODO Здесь нужно кинуть исключение
         }

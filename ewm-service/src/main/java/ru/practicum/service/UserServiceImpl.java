@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.exception.UserNotFoundException;
 import ru.practicum.mapper.UserMapper;
 import ru.practicum.model.User;
 import ru.practicum.model.dto.UserDto;
@@ -30,7 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAll(Integer[] ids, Integer from, Integer size) {
+    public List<UserDto> getAll(List<Integer> ids, Integer from, Integer size) {
         List<UserDto> userDtos = new ArrayList<>();
         if (ids != null) {
             for (Integer id : ids) {
@@ -50,6 +51,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteById(Integer userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " was not found.");
+        }
         userRepository.deleteById(userId);
     }
 }
