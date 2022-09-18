@@ -1,6 +1,7 @@
 package ru.practicum.service.interfaces;
 
 import ru.practicum.model.dto.EventFullDto;
+import ru.practicum.model.dto.EventShortDto;
 import ru.practicum.model.dto.NewEventDto;
 
 import java.util.List;
@@ -15,6 +16,10 @@ public interface EventService {
 
     EventFullDto publishEvent(Integer eventId);
 
-    List<EventFullDto> getAllUsersEvents(Integer userId, Integer from, Integer size);
+    EventFullDto rejectEvent(Integer eventId);
+
+    List<EventShortDto> getAllUsersEvents(Integer userId, Integer from, Integer size);
+
+    EventFullDto getUserEvent(Integer userId, Integer eventId);
 
 }

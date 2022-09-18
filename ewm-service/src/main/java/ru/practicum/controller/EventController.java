@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.dto.EventFullDto;
+import ru.practicum.model.dto.EventShortDto;
 import ru.practicum.model.dto.NewEventDto;
 import ru.practicum.service.interfaces.EventService;
 
@@ -43,16 +44,25 @@ public class EventController {
     }
 
     @GetMapping("/users/{userId}/events")
-    public Collection<EventFullDto> getAllUsersEvents(@PathVariable Integer userId,
-                                                      @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
-                                                      @Positive @RequestParam(defaultValue = "10") Integer size) {
+    public Collection<EventShortDto> getAllUsersEvents(@PathVariable Integer userId,
+                                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
         return eventService.getAllUsersEvents(userId, from, size);
     }
 
+    @GetMapping("/users/{userId}/events/{eventId}")
+    public EventFullDto getUserEvent(@PathVariable Integer userId, @PathVariable Integer eventId) {
+        return eventService.getUserEvent(userId, eventId);
+    }
 
     // Admin
     @PatchMapping("/admin/events/{eventId}/publish")
     public EventFullDto publishEvent(@PathVariable Integer eventId) {
         return eventService.publishEvent(eventId);
+    }
+
+    @PatchMapping("/admin/events/{eventId}/reject")
+    public EventFullDto rejectEvent(@PathVariable Integer eventId) {
+        return eventService.rejectEvent(eventId);
     }
 }

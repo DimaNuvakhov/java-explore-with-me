@@ -95,6 +95,16 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
     }
 
+    public EventFullDto rejectEvent(Integer eventId) {
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        if (!foundedEvent.getState().equals(State.PENDING.toString())) {
+            throw new IllegalStateException("Only pending events can be canceled");
+        }
+        foundedEvent.setState(State.CANCELED.toString());
+        return EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
+    }
+
     public EventFullDto getEventByIdPublic(Integer eventId, String ip, String uri) {
         Event foundedEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
@@ -107,21 +117,45 @@ public class EventServiceImpl implements EventService {
         // Получаем все подтвержденные запрос и заполняем поле
         eventDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
                 eventId, Status.APPROVED.toString()).size());
-        eventDto.setViews(getViewsRequest(ip, uri));
+        eventDto.setViews(getViewsRequest(uri));
         return eventDto;
     }
 
-    public List<EventFullDto> getAllUsersEvents(Integer userId, Integer from, Integer size) {
+    public List<EventShortDto> getAllUsersEvents(Integer userId, Integer from, Integer size) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " was not found.");
+        }
         PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
         List<EventShortDto> eventShortDtoList = eventRepository.findAllByInitiatorId(userId, pageRequest).stream()
                 .map(EventMapper::toEventShortDto).collect(Collectors.toList());
         for (EventShortDto eventShortDto : eventShortDtoList) {
-
+            eventShortDto.setConfirmedRequests(requestRepository
+                    .findAllByEventAndStatusIs(eventShortDto.getId(), Status.APPROVED.toString()).size());
+            String uri = "/events/" + eventShortDto.getId();
+            eventShortDto.setViews(getViewsRequest(uri));
         }
-        return null;
+        return eventShortDtoList;
     }
 
-    private Integer getViewsRequest(String ip, String uri) {
+    public EventFullDto getUserEvent(Integer userId, Integer eventId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " was not found.");
+        }
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        if (!foundedEvent.getInitiator().getId().equals(userId)) {
+            throw new IllegalIdException(
+                    "User with id " + userId + " is not the initiator of the event with id " + eventId);
+        }
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(foundedEvent);
+        eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
+                eventId, Status.APPROVED.toString()).size());
+        String uri = "/events/" + eventId;
+        eventFullDto.setViews(getViewsRequest(uri));
+        return eventFullDto;
+    }
+
+    private Integer getViewsRequest(String uri) {
         // Получаем минимальную дату
         LocalDateTime start = eventRepository.findMinPublishedOn(); // TODO Разобратсья что передавать
         // Получаем максимальную дату

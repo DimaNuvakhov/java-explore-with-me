@@ -21,7 +21,6 @@ public class StatsServiceImpl implements StatsService {
     }
 
     public EndpointHit add(EndpointHit endpointHit) {
-//        endpointHit.setTimestamp(LocalDateTime.now());
         return statsRepository.save(endpointHit);
     }
 
@@ -30,9 +29,9 @@ public class StatsServiceImpl implements StatsService {
         // Тут я полагаю, что помимо нашего основного сервиса возможны и другие
         for (String app : statsRepository.findApp()) {
             for (String uri : uris) {
-                if (unique && statsRepository.statsWithUniqueIp(start, end, uri, app) != 0) {
+                if (unique) {
                     stats.add(new ViewStats(app, uri, statsRepository.statsWithUniqueIp(start, end, uri, app)));
-                } else if (!unique && statsRepository.statsWithoutUniqueIp(start, end, uri, app) != 0) {
+                } else {
                     stats.add(new ViewStats(app, uri, statsRepository.statsWithoutUniqueIp(start, end, uri, app)));
                 }
             }

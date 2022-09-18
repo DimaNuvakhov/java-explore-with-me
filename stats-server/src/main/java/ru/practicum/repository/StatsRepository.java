@@ -20,4 +20,5 @@ public interface StatsRepository extends JpaRepository<EndpointHit, Integer> {
     @Query(value = "select app from endpoint_hits " +
             "group by app", nativeQuery = true)
     List<String> findApp();
+
 }
