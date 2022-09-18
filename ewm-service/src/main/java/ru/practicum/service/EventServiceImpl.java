@@ -1,6 +1,8 @@
 package ru.practicum.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.client.EventClient;
@@ -10,6 +12,7 @@ import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.LocationMapper;
 import ru.practicum.model.*;
 import ru.practicum.model.dto.EventFullDto;
+import ru.practicum.model.dto.EventShortDto;
 import ru.practicum.model.dto.NewEventDto;
 import ru.practicum.repository.*;
 import ru.practicum.service.interfaces.EventService;
@@ -17,6 +20,7 @@ import ru.practicum.service.interfaces.EventService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -103,7 +107,17 @@ public class EventServiceImpl implements EventService {
         // Получаем все подтвержденные запрос и заполняем поле
         eventDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
                 eventId, Status.APPROVED.toString()).size());
-        System.out.println(getViewsRequest(ip, uri));
+        eventDto.setViews(getViewsRequest(ip, uri));
+        return eventDto;
+    }
+
+    public List<EventFullDto> getAllUsersEvents(Integer userId, Integer from, Integer size) {
+        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
+        List<EventShortDto> eventShortDtoList = eventRepository.findAllByInitiatorId(userId, pageRequest).stream()
+                .map(EventMapper::toEventShortDto).collect(Collectors.toList());
+        for (EventShortDto eventShortDto : eventShortDtoList) {
+
+        }
         return null;
     }
 
@@ -114,10 +128,9 @@ public class EventServiceImpl implements EventService {
         LocalDateTime end = eventRepository.findMaxPublishedOn(); // TODO Разобратсья что передавать
         // Формируес список uri
         // Формируем запрос для получения данных с сервиса статистики
-        ResponseEntity<Object> list = eventClient.getRequest(start.minusDays(1), end.plusDays(1), uri, true);
+        ResponseEntity<Object> list = eventClient.getRequest(start.minusDays(1), end.plusDays(1), uri, false);
         List<Map<String, Object>> statsList = (List<Map<String, Object>>) list.getBody();
         Map<String, Object> statsMap = statsList.get(0);
         return (Integer) statsMap.get("hits");
     }
-
 }

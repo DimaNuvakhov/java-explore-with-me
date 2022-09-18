@@ -3,9 +3,12 @@ package ru.practicum.mapper;
 import ru.practicum.model.Event;
 import ru.practicum.model.State;
 import ru.practicum.model.dto.EventFullDto;
+import ru.practicum.model.dto.EventShortDto;
 import ru.practicum.model.dto.NewEventDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EventMapper {
 
@@ -26,6 +29,22 @@ public class EventMapper {
                 event.getPublishedOn(), event.getRequestModeration(), event.getState(), event.getTitle(),
                 null
         );
+    }
+
+    public static EventShortDto toEventShortDto(Event event) {
+        return new EventShortDto(event.getId(), event.getAnnotation(),
+                CategoryMapper.toCategoryDto(event.getCategory()),
+                null, event.getEventDate(), UserMapper.toUserShortDto(event.getInitiator()),
+                event.getPaid(), event.getTitle(), null
+        );
+    }
+
+    public static List<EventFullDto> toEventFullDtoList(List<Event> events) {
+        List<EventFullDto> eventFullDtos = new ArrayList<>();
+        for (Event event : events) {
+            eventFullDtos.add(toEventFullDto(event));
+        }
+        return eventFullDtos;
     }
 
 }

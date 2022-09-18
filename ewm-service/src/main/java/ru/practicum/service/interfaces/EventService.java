@@ -3,6 +3,8 @@ package ru.practicum.service.interfaces;
 import ru.practicum.model.dto.EventFullDto;
 import ru.practicum.model.dto.NewEventDto;
 
+import java.util.List;
+
 public interface EventService {
 
     EventFullDto post(NewEventDto newEventDto, Integer userId);
@@ -12,5 +14,7 @@ public interface EventService {
     EventFullDto getEventByIdPublic(Integer eventId, String ip, String uri);
 
     EventFullDto publishEvent(Integer eventId);
+
+    List<EventFullDto> getAllUsersEvents(Integer userId, Integer from, Integer size);
 
 }

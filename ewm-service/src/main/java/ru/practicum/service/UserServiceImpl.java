@@ -32,15 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll(List<Integer> ids, Integer from, Integer size) {
-        List<UserDto> userDtos = new ArrayList<>();
         if (ids != null) {
-            for (Integer id : ids) {
-                User newUser = userRepository.findById(id).orElse(new User());
-                if (newUser.getId() != null) {
-                    userDtos.add(UserMapper.toUserDto(newUser)); // TODO Разобраться
-                }
-            }
-            return userDtos;
+            List<User> users = userRepository.findUsers(ids);
+            return UserMapper.toUserDtoList(users);
         } else {
             PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
             return userRepository.findAll(pageRequest).stream()

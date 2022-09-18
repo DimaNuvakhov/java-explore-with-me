@@ -9,6 +9,9 @@ import ru.practicum.service.interfaces.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import java.util.Collection;
 
 @Validated
 @RestController
@@ -38,6 +41,14 @@ public class EventController {
     public EventFullDto cancelEvent(@PathVariable Integer userId, @PathVariable Integer eventId) {
         return eventService.cancelEvent(userId, eventId);
     }
+
+    @GetMapping("/users/{userId}/events")
+    public Collection<EventFullDto> getAllUsersEvents(@PathVariable Integer userId,
+                                                      @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                                      @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return eventService.getAllUsersEvents(userId, from, size);
+    }
+
 
     // Admin
     @PatchMapping("/admin/events/{eventId}/publish")
