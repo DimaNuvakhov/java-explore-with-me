@@ -38,5 +38,10 @@ public class ParticipationRequestController {
         return participationRequestService.getAllUserEventRequests(userId, eventId);
     }
 
+    @PatchMapping("/users/{userId}/requests/{requestId}/cancel")
+    public ParticipationRequestDto cancelUserRequest(@PathVariable Integer userId, @PathVariable Integer requestId) {
+        return participationRequestService.cancelUserRequest(userId, requestId);
+    }
+
 
 }

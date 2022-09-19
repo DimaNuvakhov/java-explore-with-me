@@ -26,7 +26,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
-
     @ExceptionHandler(UserNotFoundException.class)
     protected ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
@@ -83,7 +82,25 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException ex) {
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN);
+        apiError.setMessage(ex.getMessage());
+        String reason = "For the requested operation the conditions are not met.";
+        apiError.setReason(reason);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(InvalidAccessException.class)
+    protected ResponseEntity<Object> handleInvalidAccessException(InvalidAccessException ex) {
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN);
+        apiError.setMessage(ex.getMessage());
+        String reason = "For the requested operation the conditions are not met.";
+        apiError.setReason(reason);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(ParticipantLimitException.class)
+    protected ResponseEntity<Object> handleParticipantLimitException(ParticipantLimitException ex) {
+        ApiError apiError = new ApiError(HttpStatus.FORBIDDEN);
         apiError.setMessage(ex.getMessage());
         String reason = "For the requested operation the conditions are not met.";
         apiError.setReason(reason);

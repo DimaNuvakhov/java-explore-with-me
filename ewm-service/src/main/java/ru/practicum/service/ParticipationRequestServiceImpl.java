@@ -1,13 +1,10 @@
 package ru.practicum.service;
 
 import org.springframework.stereotype.Service;
-import ru.practicum.exception.EventNotFoundException;
-import ru.practicum.exception.UserNotFoundException;
+import ru.practicum.exception.*;
+import ru.practicum.exception.IllegalStateException;
 import ru.practicum.mapper.ParticipationRequestMapper;
-import ru.practicum.model.Event;
-import ru.practicum.model.State;
-import ru.practicum.model.Status;
-import ru.practicum.model.User;
+import ru.practicum.model.*;
 import ru.practicum.model.dto.ParticipationRequestDto;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.ParticipationRequestRepository;
@@ -34,7 +31,8 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
 
     public ParticipationRequestDto post(Integer userId, Integer eventId, ParticipationRequestDto requestDto) {
         if (requestRepository.existsByRequesterAndAndEvent(userId, eventId)) {
-            // TODO нужно кинуть исключение
+            throw new ParticipationRequestNotFoundException("Request with requester Id" + userId + " and event Id "
+                    + eventId + " was not found.");
         }
         requestDto.setCreated(LocalDateTime.now());
         Event foundedEvent = eventRepository.findById(eventId)
@@ -42,15 +40,16 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + userId + " was not found."));
         if (foundedEvent.getInitiator().getId().equals(requester.getId())) {
-            // TODO Здесь нужно кинуть исключение
+            throw new InvalidAccessException("Initiator of the event cannot add a request to participate in his event.");
         }
         if (!foundedEvent.getState().equals(State.PUBLISHED.toString())) {
-            // TODO Здесь нужно кинуть исключение
+            throw new IllegalStateException("Only a published event can accept participation requests.");
         }
-//        Integer limit = foundedEvent.getParticipantLimit();
-//        if (foundedEvent.getParticipantLimit().equals(limit)) {
-//            // TODO Здесь нужно кинуть исключение
-//        } // TODO Доделать
+        Integer confirmedRequests = requestRepository
+                .findAllByEventAndStatusIs(foundedEvent.getId(), Status.APPROVED.toString()).size();
+        if (foundedEvent.getParticipantLimit().equals(confirmedRequests)) {
+            throw new ParticipantLimitException("Limit of requests for participation has been reached");
+        }
         if (!foundedEvent.getRequestModeration()) {
             requestDto.setStatus(Status.APPROVED.toString());
         }
@@ -65,11 +64,32 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     }
 
     public List<ParticipationRequestDto> getAllUserEventRequests(Integer userId, Integer eventId) {
-        Event foundedEvent = eventRepository.findById(eventId).orElse(new Event()); // TODO Здесь нужно кинуть исключение
-        User initiator = userRepository.findById(userId).orElse(new User()); // TODO Здесь нужно кинуть исключение
-        if (!foundedEvent.getInitiator().getId().equals(initiator.getId())) {
-            // TODO Оба айдишника должны совпадать
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " was not found.");
+        }
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        if (!foundedEvent.getInitiator().getId().equals(userId)) {
+            throw new IllegalIdException(
+                    "User with id " + userId + " is not the initiator of the event with id " + eventId);
         }
         return ParticipationRequestMapper.toRequestDtoList(requestRepository.findAllByEvent(foundedEvent.getId()));
     }
+
+    public ParticipationRequestDto cancelUserRequest(Integer userId, Integer requestId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " was not found.");
+        }
+        ParticipationRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ParticipationRequestNotFoundException(
+                        "Request with id " + requestId + " was not found."));
+        if (!request.getRequester().equals(userId)) {
+            throw new InvalidAccessException(
+                    "User with id " + userId + " is not the requester of the request with id " + requestId);
+        }
+        request.setStatus(Status.REJECTED.toString());
+        return ParticipationRequestMapper
+                .toParticipationRequestDto(requestRepository.save(request));
+    }
+
 }
