@@ -2,10 +2,7 @@ package ru.practicum.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.dto.CompilationDto;
 import ru.practicum.model.dto.NewCompilationDto;
 import ru.practicum.service.interfaces.CompilationService;
@@ -30,4 +27,10 @@ public class CompilationController {
     public CompilationDto post(@RequestBody @Valid NewCompilationDto newCompilationDto) {
         return compilationService.post(newCompilationDto);
     }
+
+    @DeleteMapping("/admin/compilations/{compId}")
+    public void deleteCompilationById(@PathVariable Integer compId) {
+        compilationService.deleteCompilationById(compId);
+    }
+
 }

@@ -7,4 +7,6 @@ public interface CompilationService {
 
     CompilationDto post(NewCompilationDto newCompilationDto);
 
+    void deleteCompilationById(Integer compId);
+
 }

@@ -14,7 +14,7 @@ public class NewCompilationDto {
     @NotNull
     private List<Integer> events;
 
-    @NotEmpty
+    @NotNull
     private Boolean pinned;
 
     @NotEmpty
