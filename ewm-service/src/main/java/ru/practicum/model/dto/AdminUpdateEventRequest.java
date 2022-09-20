@@ -3,39 +3,28 @@ package ru.practicum.model.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 public class AdminUpdateEventRequest {
 
-    @NotEmpty
     private String annotation;
 
-    @NotNull
     private Integer category;
 
-    @NotEmpty
     private String description;
 
-    @NotNull
     private LocalDateTime eventDate;
 
-    @NotNull
     private LocationDto location;
 
-    @NotNull
     private Boolean paid;
 
-    @NotNull
     private Integer participantLimit;
 
-    @NotNull
     private Boolean requestModeration;
 
-    @NotEmpty
     private String title;
 
     public AdminUpdateEventRequest(String annotation, Integer category, String description, LocalDateTime eventDate,

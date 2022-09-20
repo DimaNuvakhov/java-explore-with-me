@@ -3,9 +3,7 @@ package ru.practicum.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.dto.EventFullDto;
-import ru.practicum.model.dto.EventShortDto;
-import ru.practicum.model.dto.NewEventDto;
+import ru.practicum.model.dto.*;
 import ru.practicum.service.interfaces.EventService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +53,12 @@ public class EventController {
         return eventService.getUserEvent(userId, eventId);
     }
 
+    @PatchMapping("/users/{userId}/events")
+    public EventFullDto updateEventByUser(@PathVariable Integer userId,
+                                          @RequestBody UpdateEventRequest updateEventRequest) {
+        return eventService.updateEventByUser(userId, updateEventRequest);
+    }
+
     // Admin
     @PatchMapping("/admin/events/{eventId}/publish")
     public EventFullDto publishEvent(@PathVariable Integer eventId) {
@@ -65,4 +69,12 @@ public class EventController {
     public EventFullDto rejectEvent(@PathVariable Integer eventId) {
         return eventService.rejectEvent(eventId);
     }
+
+    @PutMapping("/admin/events/{eventId}")
+    public EventFullDto putEventByAdmin(@PathVariable Integer eventId,
+                                        @RequestBody AdminUpdateEventRequest adminUpdateEventRequest) {
+        return eventService.putEventByAdmin(eventId, adminUpdateEventRequest);
+    }
+
+
 }

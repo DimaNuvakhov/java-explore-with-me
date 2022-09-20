@@ -9,12 +9,11 @@ import ru.practicum.client.EventClient;
 import ru.practicum.commonLibrary.Library;
 import ru.practicum.exception.*;
 import ru.practicum.exception.IllegalStateException;
+import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.LocationMapper;
 import ru.practicum.model.*;
-import ru.practicum.model.dto.EventFullDto;
-import ru.practicum.model.dto.EventShortDto;
-import ru.practicum.model.dto.NewEventDto;
+import ru.practicum.model.dto.*;
 import ru.practicum.repository.*;
 import ru.practicum.service.interfaces.EventService;
 
@@ -152,6 +151,73 @@ public class EventServiceImpl implements EventService {
         eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
                 eventId, Status.APPROVED.toString()).size());
         String uri = "/events/" + eventId;
+        eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+        return eventFullDto;
+    }
+
+    public EventFullDto updateEventByUser(Integer userId, UpdateEventRequest updateEventRequest) {
+        Event foundedEvent = eventRepository.findById(updateEventRequest.getEventId())
+                .orElseThrow(() -> new EventNotFoundException(
+                        "Event with id " + updateEventRequest.getEventId() + " was not found."));
+        Category foundedCategory = categoryRepository.findById(updateEventRequest.getCategory())
+                .orElseThrow(() -> new CategoryNotFoundException(
+                        "Category with id " + updateEventRequest.getCategory() + " was not found."));
+        if (foundedEvent.getState().equals(State.PUBLISHED.toString())) {
+            throw new InvalidAccessException("To cancel an event, the status must be either PENDING or CANCELED");
+        }
+        if (foundedEvent.getState().equals(State.CANCELED.toString())) {
+            foundedEvent.setState(State.PENDING.toString());
+        }
+        if (updateEventRequest.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new IllegalDateException("Date and time for which the event is scheduled cannot be earlier" +
+                    " than two hours from the current moment");
+        }
+        foundedEvent.setAnnotation(updateEventRequest.getAnnotation());
+        foundedEvent.setCategory(foundedCategory);
+        foundedEvent.setDescription(updateEventRequest.getDescription());
+        foundedEvent.setEventDate(updateEventRequest.getEventDate());
+        foundedEvent.setPaid(updateEventRequest.getPaid());
+        foundedEvent.setParticipantLimit(updateEventRequest.getParticipantLimit());
+        Integer confirmedRequestsNumber = requestRepository
+                .findAllByEventAndStatusIs(foundedEvent.getId(), Status.APPROVED.toString()).size();
+        if (foundedEvent.getParticipantLimit() < confirmedRequestsNumber) {
+            throw new InvalidAccessException("The value in the updated \"participantLimit\" field cannot be less" +
+                    " than confirmed requests of the event");
+        }
+        foundedEvent.setTitle(updateEventRequest.getTitle());
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
+        eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
+        String uri = "/events/" + eventFullDto.getId();
+        eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+        return eventFullDto;
+    }
+
+    public EventFullDto putEventByAdmin(Integer eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
+        Category foundedCategory = categoryRepository.findById(adminUpdateEventRequest.getCategory())
+                .orElseThrow(() -> new CategoryNotFoundException(
+                        "Category with id " + adminUpdateEventRequest.getCategory() + " was not found."));
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        Event updatedEvent = EventMapper.toEventFromAdminUpdateEventRequest(adminUpdateEventRequest);
+
+        Integer confirmedRequestsNumber = requestRepository
+                .findAllByEventAndStatusIs(eventId, Status.APPROVED.toString()).size();
+        // Я не мог этого не провалидировать
+        if (updatedEvent.getParticipantLimit() < confirmedRequestsNumber) {
+            throw new InvalidAccessException("The value in the updated \"participantLimit\" field cannot be less" +
+                    " than confirmed requests of the event");
+        }
+
+        updatedEvent.setId(foundedEvent.getId());
+        updatedEvent.setCategory(foundedCategory);
+        updatedEvent.setCreatedOn(foundedEvent.getCreatedOn());
+        updatedEvent.setInitiator(foundedEvent.getInitiator());
+        updatedEvent.getLocation().setId(foundedEvent.getLocation().getId());
+        updatedEvent.setPublishedOn(foundedEvent.getPublishedOn());
+        updatedEvent.setState(foundedEvent.getState());
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(updatedEvent));
+        eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
+        String uri = "/events/" + eventFullDto.getId();
         eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         return eventFullDto;
     }

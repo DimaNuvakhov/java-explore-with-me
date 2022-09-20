@@ -9,7 +9,7 @@ public class LocationMapper {
         return new Location(null, locationDto.getLat(), locationDto.getLon());
     }
 
-    public static LocationDto locationDto (Location location) {
+    public static LocationDto toLocationDto (Location location) {
         return new LocationDto(location.getLat(), location.getLon());
     }
 
