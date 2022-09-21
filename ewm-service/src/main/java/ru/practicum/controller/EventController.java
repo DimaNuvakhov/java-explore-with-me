@@ -34,6 +34,23 @@ public class EventController {
         return eventService.getEventByIdPublic(eventId, request.getRemoteAddr(), request.getRequestURI());
     }
 
+    @GetMapping("/events")
+    public Collection<EventFullDto> getPublicEvents(
+            @RequestParam String text,
+            @RequestParam List<Integer> categories,
+            @RequestParam Boolean paid,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeStart,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeEnd,
+            @RequestParam Boolean onlyAvailable,
+            @RequestParam String sort,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size,
+            HttpServletRequest request) {
+        return eventService.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort,
+                from, size, request.getRemoteAddr(), request.getRequestURI());
+    }
+
+
     //Private
 
     @PostMapping("/users/{userId}/events")

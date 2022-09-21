@@ -18,6 +18,7 @@ import ru.practicum.repository.*;
 import ru.practicum.service.interfaces.EventService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -239,5 +240,57 @@ public class EventServiceImpl implements EventService {
             eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         }
         return foundedEvents;
+    }
+
+    public List<EventFullDto> getPublicEvents(String text, List<Integer> categories, Boolean paid, LocalDateTime rangeStart,
+                                              LocalDateTime rangeEnd, Boolean onlyAvailable, String sort,
+                                              Integer from, Integer size, String ip, String savedUri) {
+
+        List<EventFullDto> events = new ArrayList<>();
+        if (rangeStart == null && rangeEnd == null) {
+            if (sort.equals("EVENT_DATE")) {
+                PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("event_date"));
+                events = getPublicEventsWithoutDates(events, text, categories, paid, pageRequest);
+            } else if (sort.equals("VIEWS")) {
+                PageRequest pageRequest = PageRequest.of(from / size, size);
+                events = getPublicEventsWithoutDates(events, text, categories, paid, pageRequest);
+                events.stream().sorted().collect(Collectors.toList());
+            }
+        }
+        if (sort.equals("EVENT_DATE")) {
+            PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("event_date"));
+            events = eventRepository.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, pageRequest).stream()
+                    .map(EventMapper::toEventFullDto)
+                    .collect(Collectors.toList());
+            for (EventFullDto eventFullDto : events) {
+                Integer confirmedRequestsNumber = requestRepository
+                        .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
+                eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
+                String uri = "/events/" + eventFullDto.getId();
+                eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+            }
+        } else if (sort.equals("VIEWS")) {
+            PageRequest pageRequest = PageRequest.of(from / size, size);
+            events = getPublicEventsWithoutDates(events, text, categories, paid, pageRequest);
+            events.stream().sorted().collect(Collectors.toList());
+        }
+        return events; // TODO Закончить
+    }
+
+
+    private List<EventFullDto> getPublicEventsWithoutDates(List<EventFullDto> events, String text,
+                                                           List<Integer> categories, Boolean paid, PageRequest pageRequest) {
+        events = eventRepository.getPublicEventsWithoutDates(text, categories, paid, LocalDateTime.now(),
+                        pageRequest).stream()
+                .map(EventMapper::toEventFullDto)
+                .collect(Collectors.toList());
+        for (EventFullDto eventFullDto : events) {
+            Integer confirmedRequestsNumber = requestRepository
+                    .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
+            eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
+            String uri = "/events/" + eventFullDto.getId();
+            eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+        }
+        return events;
     }
 }
