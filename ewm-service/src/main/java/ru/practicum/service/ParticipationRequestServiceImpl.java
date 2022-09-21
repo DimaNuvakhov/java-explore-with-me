@@ -13,6 +13,7 @@ import ru.practicum.service.interfaces.ParticipationRequestService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
@@ -60,7 +61,9 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     }
 
     public List<ParticipationRequestDto> getAllUserRequests(Integer userId) {
-        return null;
+        return requestRepository.findAllByRequester(userId).stream()
+                .map(ParticipationRequestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     public List<ParticipationRequestDto> getAllUserEventRequests(Integer userId, Integer eventId) {
@@ -76,20 +79,78 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         return ParticipationRequestMapper.toRequestDtoList(requestRepository.findAllByEvent(foundedEvent.getId()));
     }
 
-    public ParticipationRequestDto cancelUserRequest(Integer userId, Integer requestId) {
+    public ParticipationRequestDto cancelUserRequest(Integer userId, Integer reqId) {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User with id " + userId + " was not found.");
         }
-        ParticipationRequest request = requestRepository.findById(requestId)
+        ParticipationRequest request = requestRepository.findById(reqId)
                 .orElseThrow(() -> new ParticipationRequestNotFoundException(
-                        "Request with id " + requestId + " was not found."));
+                        "Request with id " + reqId + " was not found."));
         if (!request.getRequester().equals(userId)) {
             throw new InvalidAccessException(
-                    "User with id " + userId + " is not the requester of the request with id " + requestId);
+                    "User with id " + userId + " is not the requester of the request with id " + reqId);
         }
         request.setStatus(Status.REJECTED.toString());
         return ParticipationRequestMapper
                 .toParticipationRequestDto(requestRepository.save(request));
     }
 
+    public ParticipationRequestDto confirmRequest(Integer userId, Integer eventId, Integer reqId) {
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        ParticipationRequest foundedParticipationRequest = requestRepository.findById(reqId)
+                .orElseThrow(() -> new ParticipationRequestNotFoundException(
+                        "Request with id " + reqId + " was not found."));
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " was not found.");
+        }
+        if (!foundedEvent.getInitiator().getId().equals(userId)) {
+            throw new InvalidAccessException(
+                    "User with id " + userId + " is not the initiator of the event with id " + eventId);
+        }
+        if (foundedParticipationRequest.getRequester().equals(userId)) {
+            throw new InvalidAccessException("User can not participate in his own event");
+        }
+        if (foundedEvent.getParticipantLimit() == 0 || !foundedEvent.getRequestModeration()) {
+            foundedParticipationRequest.setStatus(Status.APPROVED.toString());
+        }
+        Integer confirmedRequestsNumber = requestRepository
+                .findAllByEventAndStatusIs(eventId, Status.APPROVED.toString()).size();
+        if (foundedEvent.getParticipantLimit().equals(confirmedRequestsNumber)) {
+            foundedParticipationRequest.setStatus(Status.REJECTED.toString());
+        }
+        foundedParticipationRequest.setStatus(Status.APPROVED.toString());
+        if (foundedEvent.getParticipantLimit().equals(confirmedRequestsNumber)) {
+            List<ParticipationRequest> participationRequestList = requestRepository
+                    .findAllByEventAndStatusIs(eventId, Status.PENDING.toString());
+            for (ParticipationRequest participationRequest : participationRequestList) {
+                participationRequest.setStatus(Status.REJECTED.toString());
+                requestRepository.save(participationRequest);
+            }
+        }
+        return ParticipationRequestMapper.toParticipationRequestDto(foundedParticipationRequest);
+    }
+
+    public ParticipationRequestDto rejectRequest(Integer userId, Integer eventId, Integer reqId) {
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        ParticipationRequest foundedParticipationRequest = requestRepository.findById(reqId)
+                .orElseThrow(() -> new ParticipationRequestNotFoundException(
+                        "Request with id " + reqId + " was not found."));
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " was not found.");
+        }
+        if (!foundedEvent.getInitiator().getId().equals(userId)) {
+            throw new InvalidAccessException(
+                    "User with id " + userId + " is not the initiator of the event with id " + eventId);
+        }
+        if (foundedParticipationRequest.getRequester().equals(userId)) {
+            throw new InvalidAccessException("User can not participate in his own event");
+        }
+        if (!foundedParticipationRequest.getStatus().equals(Status.PENDING.toString())) {
+            throw new InvalidAccessException("Only pending requests can be rejected");
+        }
+        foundedParticipationRequest.setStatus(Status.REJECTED.toString());
+        return ParticipationRequestMapper.toParticipationRequestDto(requestRepository.save(foundedParticipationRequest));
+    }
 }

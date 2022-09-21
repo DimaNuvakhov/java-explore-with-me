@@ -43,5 +43,17 @@ public class ParticipationRequestController {
         return participationRequestService.cancelUserRequest(userId, requestId);
     }
 
+    @PatchMapping("/users/{userId}/events/{eventId}/requests/{reqId}/confirm")
+    public ParticipationRequestDto confirmRequest(@PathVariable Integer userId,
+                                                  @PathVariable Integer eventId,
+                                                  @PathVariable Integer reqId) {
+        return participationRequestService.confirmRequest(userId, eventId, reqId);
+    }
 
+    @PatchMapping("/users/{userId}/events/{eventId}/requests/{reqId}/reject")
+    public ParticipationRequestDto rejectRequest(@PathVariable Integer userId,
+                                                 @PathVariable Integer eventId,
+                                                 @PathVariable Integer reqId) {
+        return participationRequestService.rejectRequest(userId, eventId, reqId);
+    }
 }
