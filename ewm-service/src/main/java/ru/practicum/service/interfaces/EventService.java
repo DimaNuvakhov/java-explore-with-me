@@ -1,7 +1,9 @@
 package ru.practicum.service.interfaces;
 
+import ru.practicum.model.State;
 import ru.practicum.model.dto.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
@@ -23,4 +25,8 @@ public interface EventService {
     EventFullDto updateEventByUser(Integer userId, UpdateEventRequest updateEventRequest);
 
     EventFullDto putEventByAdmin(Integer eventId, AdminUpdateEventRequest adminUpdateEventRequest);
+
+    List<EventFullDto> getEventsByAdmin(List<Integer> users, List<String> states, List<Integer> categories,
+                                        LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from,
+                                        Integer size);
 }

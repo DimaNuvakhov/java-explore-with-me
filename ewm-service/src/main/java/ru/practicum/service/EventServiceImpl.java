@@ -222,14 +222,22 @@ public class EventServiceImpl implements EventService {
         return eventFullDto;
     }
 
-    private Integer getViewsRequest(String uri) { // TODO Позже удалить
-        // Получаем минимальную дату
-        LocalDateTime start = eventRepository.findMinCreatedOn();
-        // Формируем запрос для получения данных с сервиса статистики
-        ResponseEntity<Object> list = eventClient.getRequest(start, LocalDateTime.now(), uri, false);
-        // Обрабатываем ответ
-        List<Map<String, Object>> statsList = (List<Map<String, Object>>) list.getBody();
-        Map<String, Object> statsMap = statsList.get(0);
-        return (Integer) statsMap.get("hits");
+    public List<EventFullDto> getEventsByAdmin(List<Integer> users, List<String> states, List<Integer> categories,
+                                               LocalDateTime rangeStart, LocalDateTime rangeEnd, Integer from,
+                                               Integer size) {
+
+        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
+        List<EventFullDto> foundedEvents = eventRepository.getEvents(rangeStart, rangeEnd, users, states, categories,
+                        pageRequest).stream()
+                .map(EventMapper::toEventFullDto)
+                .collect(Collectors.toList());
+        for (EventFullDto eventFullDto : foundedEvents) {
+            Integer confirmedRequestsNumber = requestRepository
+                    .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
+            eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
+            String uri = "/events/" + eventFullDto.getId();
+            eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+        }
+        return foundedEvents;
     }
 }
