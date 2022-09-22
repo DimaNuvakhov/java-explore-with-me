@@ -15,6 +15,8 @@ import ru.practicum.exception.*;
 import ru.practicum.exception.IllegalStateException;
 import ru.practicum.model.ApiError;
 
+import java.util.Arrays;
+
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
@@ -31,6 +33,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(ex.getMessage());
         String reason = "The required object was not found.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        } // TODO Проверить
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }

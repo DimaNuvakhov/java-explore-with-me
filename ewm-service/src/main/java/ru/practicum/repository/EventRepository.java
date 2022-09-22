@@ -22,14 +22,14 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
                           List<Integer> categories, Pageable pageable);
 
     @Query(value = "select * from (select * from events where upper(annotation) like upper(concat('%', ?1, '%')) " +
-            "or upper(description) like upper(concat('%', ?1, '%'))) as e where category_id in ?2 and paid = ?3 " +
+            "or upper(description) like upper(concat('%', ?1, '%'))) as e where category_id in (?2) and paid = ?3 " +
             "and event_date between ?4 and ?5 and state = 'PUBLISHED'", nativeQuery = true)
-    Page<Event> getPublicEvents(String text, List<Integer> categories, Boolean paid, LocalDateTime rangeStart,
+    List<Event> getPublicEvents(String text, List<Integer> categories, Boolean paid, LocalDateTime rangeStart,
                                 LocalDateTime rangeEnd, Pageable pageable);
 
     @Query(value = "select * from (select * from events where upper(annotation) like upper(concat('%', ?1, '%')) " +
-            "or upper(description) like upper(concat('%', ?1, '%'))) as e where category_id in ?2 and paid = ?3 " +
-            "and event_date > ?4  and state = 'PUBLISHED'", nativeQuery = true)
-    Page<Event> getPublicEventsWithoutDates(String text, List<Integer> categories, Boolean paid, LocalDateTime date,
-                                Pageable pageable);
+            "or upper(description) like upper(concat('%', ?1, '%'))) as e where category_id in (?2) and paid = ?3 " +
+            "and event_date > now()  and state = 'PUBLISHED'", nativeQuery = true)
+    List<Event> getPublicEventsWithoutDates(String text, List<Integer> categories, Boolean paid,
+                                            Pageable pageable); //TODO удалить аргумент из метода дату
 }

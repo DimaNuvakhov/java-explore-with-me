@@ -3,13 +3,11 @@ package ru.practicum.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.practicum.client.EventClient;
 import ru.practicum.commonLibrary.Library;
 import ru.practicum.exception.*;
 import ru.practicum.exception.IllegalStateException;
-import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.mapper.LocationMapper;
 import ru.practicum.model.*;
@@ -18,9 +16,8 @@ import ru.practicum.repository.*;
 import ru.practicum.service.interfaces.EventService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,9 +82,10 @@ public class EventServiceImpl implements EventService {
         LocalDateTime publishedDate = LocalDateTime.now();
         Event foundedEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
-        if (publishedDate.isAfter(foundedEvent.getEventDate().plusHours(1))) {
-
-        } // TODO Нужна помощь
+        if (publishedDate.isAfter(foundedEvent.getEventDate().minusHours(1))) {
+            throw new InvalidAccessException("The start date of the event must be no earlier than one hour " +
+                    "from the date of publication");
+        }
         if (!foundedEvent.getState().equals(State.PENDING.toString())) {
             throw new IllegalStateException("Only pending events can be published");
         }
@@ -245,51 +243,41 @@ public class EventServiceImpl implements EventService {
     public List<EventFullDto> getPublicEvents(String text, List<Integer> categories, Boolean paid, LocalDateTime rangeStart,
                                               LocalDateTime rangeEnd, Boolean onlyAvailable, String sort,
                                               Integer from, Integer size, String ip, String savedUri) {
-
-        List<EventFullDto> events = new ArrayList<>();
+        // Сохраняю информацию о том, что я дернул эту ручку в сервис статистики
+        eventClient.postRequest(new EndpointHit(null, "ewn", savedUri, ip, LocalDateTime.now()));
+        List<EventFullDto> events;
+        PageRequest pageRequest = PageRequest.of(from / size, size);
         if (rangeStart == null && rangeEnd == null) {
-            if (sort.equals("EVENT_DATE")) {
-                PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("event_date"));
-                events = getPublicEventsWithoutDates(events, text, categories, paid, pageRequest);
-            } else if (sort.equals("VIEWS")) {
-                PageRequest pageRequest = PageRequest.of(from / size, size);
-                events = getPublicEventsWithoutDates(events, text, categories, paid, pageRequest);
-                events.stream().sorted().collect(Collectors.toList());
-            }
-        }
-        if (sort.equals("EVENT_DATE")) {
-            PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("event_date"));
-            events = eventRepository.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, pageRequest).stream()
+            events = eventRepository.getPublicEventsWithoutDates(text, categories, paid, pageRequest)
+                    .stream()
                     .map(EventMapper::toEventFullDto)
                     .collect(Collectors.toList());
+        } else {
+            events = eventRepository.getPublicEvents(text, categories, paid, rangeStart, rangeEnd, pageRequest)
+                    .stream()
+                    .map(EventMapper::toEventFullDto)
+                    .collect(Collectors.toList());
+        }
+        if (onlyAvailable) {
             for (EventFullDto eventFullDto : events) {
                 Integer confirmedRequestsNumber = requestRepository
                         .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
-                eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
-                String uri = "/events/" + eventFullDto.getId();
-                eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+                if (eventFullDto.getParticipantLimit().equals(confirmedRequestsNumber)) {
+                    events.remove(eventFullDto);
+                }
             }
-        } else if (sort.equals("VIEWS")) {
-            PageRequest pageRequest = PageRequest.of(from / size, size);
-            events = getPublicEventsWithoutDates(events, text, categories, paid, pageRequest);
-            events.stream().sorted().collect(Collectors.toList());
         }
-        return events; // TODO Закончить
-    }
-
-
-    private List<EventFullDto> getPublicEventsWithoutDates(List<EventFullDto> events, String text,
-                                                           List<Integer> categories, Boolean paid, PageRequest pageRequest) {
-        events = eventRepository.getPublicEventsWithoutDates(text, categories, paid, LocalDateTime.now(),
-                        pageRequest).stream()
-                .map(EventMapper::toEventFullDto)
-                .collect(Collectors.toList());
         for (EventFullDto eventFullDto : events) {
             Integer confirmedRequestsNumber = requestRepository
                     .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
             eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
             String uri = "/events/" + eventFullDto.getId();
             eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+        }
+        if (sort.equals("EVENT_DATE")) {
+            events.sort(Comparator.comparing(EventFullDto::getEventDate));
+        } else if (sort.equals("VIEWS")) {
+            events.sort(Comparator.comparing(EventFullDto::getViews));
         }
         return events;
     }

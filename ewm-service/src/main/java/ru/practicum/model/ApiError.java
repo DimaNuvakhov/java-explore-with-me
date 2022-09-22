@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 public class ApiError {
 
-    private List<String> errors;
+    private String errors;
 
     private String message;
 
