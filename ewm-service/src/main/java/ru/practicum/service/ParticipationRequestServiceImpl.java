@@ -30,12 +30,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         this.eventRepository = eventRepository;
     }
 
-    public ParticipationRequestDto post(Integer userId, Integer eventId, ParticipationRequestDto requestDto) {
+    public ParticipationRequestDto post(Integer userId, Integer eventId) {
         if (requestRepository.existsByRequesterAndAndEvent(userId, eventId)) {
             throw new ParticipationRequestNotFoundException("Request with requester Id" + userId + " and event Id "
                     + eventId + " was not found.");
         }
-        requestDto.setCreated(LocalDateTime.now());
+        ParticipationRequest request = new ParticipationRequest();
+        request.setCreated(LocalDateTime.now());
         Event foundedEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
         User requester = userRepository.findById(userId)
@@ -52,12 +53,13 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new ParticipantLimitException("Limit of requests for participation has been reached");
         }
         if (!foundedEvent.getRequestModeration()) {
-            requestDto.setStatus(Status.APPROVED.toString());
+            request.setStatus(Status.APPROVED.toString());
         }
-        requestDto.setStatus(Status.PENDING.toString());
+        request.setStatus(Status.PENDING.toString());
+        request.setEvent(foundedEvent.getId());
+        request.setRequester(requester.getId());
         return ParticipationRequestMapper
-                .toParticipationRequestDto(requestRepository.save(ParticipationRequestMapper
-                        .toParticipationRequest(requestDto)));
+                .toParticipationRequestDto(requestRepository.save((request)));
     }
 
     public List<ParticipationRequestDto> getAllUserRequests(Integer userId) {
@@ -118,8 +120,10 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 .findAllByEventAndStatusIs(eventId, Status.APPROVED.toString()).size();
         if (foundedEvent.getParticipantLimit().equals(confirmedRequestsNumber)) {
             foundedParticipationRequest.setStatus(Status.REJECTED.toString());
+            requestRepository.save(foundedParticipationRequest);
         }
         foundedParticipationRequest.setStatus(Status.APPROVED.toString());
+        requestRepository.save(foundedParticipationRequest);
         if (foundedEvent.getParticipantLimit().equals(confirmedRequestsNumber)) {
             List<ParticipationRequest> participationRequestList = requestRepository
                     .findAllByEventAndStatusIs(eventId, Status.PENDING.toString());

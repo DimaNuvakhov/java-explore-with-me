@@ -39,8 +39,8 @@ public class EventController {
             @RequestParam String text,
             @RequestParam List<Integer> categories,
             @RequestParam Boolean paid,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeStart,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat (iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeEnd,
             @RequestParam Boolean onlyAvailable,
             @RequestParam String sort,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
@@ -103,8 +103,8 @@ public class EventController {
             @RequestParam List<Integer> users,
             @RequestParam List<String> states,
             @RequestParam List<Integer> categories,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeStart,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeEnd,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "10") Integer size
     ) {

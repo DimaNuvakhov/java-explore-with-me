@@ -12,6 +12,7 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     List<ParticipationRequest> findAllByEvent(Integer eventId);
 
+    @Query(value = "SELECT * FROM participation_requests WHERE event_id = ?1 and status = ?2", nativeQuery = true)
     List<ParticipationRequest> findAllByEventAndStatusIs(Integer eventId, String status);
 
     List<ParticipationRequest> findAllByRequester(Integer requesterId);

@@ -91,7 +91,12 @@ public class EventServiceImpl implements EventService {
         }
         foundedEvent.setState(State.PUBLISHED.toString());
         foundedEvent.setPublishedOn(publishedDate);
-        return EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
+        eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
+                eventId, Status.APPROVED.toString()).size());
+        String uri = "/events/" + eventId;
+        eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+        return eventFullDto;
     }
 
     public EventFullDto rejectEvent(Integer eventId) {
@@ -101,7 +106,12 @@ public class EventServiceImpl implements EventService {
             throw new IllegalStateException("Only pending events can be canceled");
         }
         foundedEvent.setState(State.CANCELED.toString());
-        return EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
+        eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
+                eventId, Status.APPROVED.toString()).size());
+        String uri = "/events/" + eventId;
+        eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
+        return eventFullDto;
     }
 
     public EventFullDto getEventByIdPublic(Integer eventId, String ip, String uri) {

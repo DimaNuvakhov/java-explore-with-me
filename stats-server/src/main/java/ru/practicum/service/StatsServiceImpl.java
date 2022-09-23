@@ -36,6 +36,10 @@ public class StatsServiceImpl implements StatsService {
                 }
             }
         }
-        return stats;
+        if (stats.isEmpty()) {
+            return List.of(new ViewStats(null, null, 0));
+        } else {
+            return stats;
+        }
     }
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ParticipationRequestService {
 
-    ParticipationRequestDto post(Integer userId, Integer eventId, ParticipationRequestDto requestDto);
+    ParticipationRequestDto post(Integer userId, Integer eventId);
 
     List<ParticipationRequestDto> getAllUserRequests(Integer userId);
 

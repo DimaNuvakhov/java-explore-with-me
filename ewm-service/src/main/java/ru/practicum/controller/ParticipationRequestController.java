@@ -22,9 +22,8 @@ public class ParticipationRequestController {
 
     @PostMapping("/users/{userId}/requests")
     public ParticipationRequestDto post(@PathVariable Integer userId,
-                                        @RequestParam Integer eventId,
-                                        ParticipationRequestDto requestDto) {
-        return participationRequestService.post(userId, eventId, requestDto);
+                                        @RequestParam Integer eventId) {
+        return participationRequestService.post(userId, eventId);
     }
 
     @GetMapping("/users/{userId}/requests")

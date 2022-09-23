@@ -35,4 +35,8 @@ public class ParticipationRequest {
         this.requester = requester;
         this.status = status;
     }
+
+    public ParticipationRequest() {
+
+    }
 }
