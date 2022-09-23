@@ -14,6 +14,9 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
     @Query(value = "SELECT MIN(created_on) from events", nativeQuery = true)
     LocalDateTime findMinCreatedOn();
 
+    @Query(value = "SELECT MAX(event_date) from events", nativeQuery = true)
+    LocalDateTime findMaxEventDate();
+
     Page<Event> findAllByInitiatorId(Integer initiatorId, Pageable pageable);
 
     @Query(value = "select * from events where event_date between ?1 and ?2 and initiator_id in ?3 and state in ?4" +
@@ -31,5 +34,7 @@ public interface EventRepository extends JpaRepository<Event, Integer> {
             "or upper(description) like upper(concat('%', ?1, '%'))) as e where category_id in (?2) and paid = ?3 " +
             "and event_date > now()  and state = 'PUBLISHED'", nativeQuery = true)
     List<Event> getPublicEventsWithoutDates(String text, List<Integer> categories, Boolean paid,
-                                            Pageable pageable); //TODO удалить аргумент из метода дату
+                                            Pageable pageable);
+
+    Boolean existsByCategoryId(Integer catId);
 }

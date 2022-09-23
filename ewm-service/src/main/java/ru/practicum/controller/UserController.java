@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @GetMapping("/admin/users")
-    public Collection<UserDto> getAll(@RequestParam(defaultValue = "null", required = false) List<Integer> ids,
+    public Collection<UserDto> getAll(@RequestParam(required = false) List<Integer> ids,
                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
         return userService.getAll(ids, from, size);

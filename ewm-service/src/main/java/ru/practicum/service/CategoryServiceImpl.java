@@ -5,10 +5,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.CategoryNotFoundException;
+import ru.practicum.exception.InvalidAccessException;
 import ru.practicum.model.Category;
 import ru.practicum.model.dto.CategoryDto;
 import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.repository.CategoryRepository;
+import ru.practicum.repository.EventRepository;
 import ru.practicum.service.interfaces.CategoryService;
 
 import java.util.List;
@@ -19,9 +21,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    private final EventRepository eventRepository;
+
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository, EventRepository eventRepository) {
         this.categoryRepository = categoryRepository;
+        this.eventRepository = eventRepository;
     }
 
     @Override
@@ -48,6 +53,10 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto getById(Integer catId) {
         Category category = categoryRepository.findById(catId)
                 .orElseThrow(() -> new CategoryNotFoundException("Category with id " + catId + " was not found."));
+        if (eventRepository.existsByCategoryId(catId)) {
+            throw new InvalidAccessException("it's forbidden to delete a category if at least one event is" +
+                    " associated with it");
+        }
         return CategoryMapper.toCategoryDto(category);
     }
 

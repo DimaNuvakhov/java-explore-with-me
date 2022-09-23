@@ -13,8 +13,9 @@ public class Library {
     public static Integer getViews(String uri, EventRepository eventRepository, EventClient eventClient) {
         // Получаем минимальную дату
         LocalDateTime start = eventRepository.findMinCreatedOn();
+        LocalDateTime end = eventRepository.findMaxEventDate();
         // Формируем запрос для получения данных с сервиса статистики
-        ResponseEntity<Object> list = eventClient.getRequest(start, LocalDateTime.now(), uri, false);
+        ResponseEntity<Object> list = eventClient.getRequest(start, end, uri, false);
         // Обрабатываем ответ
         List<Map<String, Object>> statsList = (List<Map<String, Object>>) list.getBody();
         Map<String, Object> statsMap = statsList.get(0);
