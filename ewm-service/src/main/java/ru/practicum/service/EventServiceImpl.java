@@ -285,9 +285,9 @@ public class EventServiceImpl implements EventService {
             eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         }
         if (sort.equals("EVENT_DATE")) {
-            events.sort(Comparator.comparing(EventFullDto::getEventDate));
+            events.sort(Comparator.comparing(EventFullDto::getEventDate).reversed());
         } else if (sort.equals("VIEWS")) {
-            events.sort(Comparator.comparing(EventFullDto::getViews));
+            events.sort(Comparator.comparing(EventFullDto::getViews).reversed());
         }
         return events;
     }
