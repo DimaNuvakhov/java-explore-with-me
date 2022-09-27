@@ -47,6 +47,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(ex.getMessage());
         String reason = "The required object was not found.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
@@ -70,6 +75,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(ex.getMessage());
         String reason = "The required object was not found.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
@@ -79,6 +89,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         apiError.setMessage(ex.getMessage());
         String reason = "For the requested operation the conditions are not met.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
@@ -88,6 +103,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         apiError.setMessage(ex.getMessage());
         String reason = "For the requested operation the conditions are not met.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
@@ -97,6 +117,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.FORBIDDEN);
         apiError.setMessage(ex.getMessage());
         String reason = "For the requested operation the conditions are not met.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
@@ -120,6 +145,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.FORBIDDEN);
         apiError.setMessage(ex.getMessage());
         String reason = "For the requested operation the conditions are not met.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
@@ -129,6 +159,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(ex.getMessage());
         String reason = "The required object was not found.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
@@ -138,6 +173,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(ex.getMessage());
         String reason = "The required object was not found.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
         apiError.setReason(reason);
         return buildResponseEntity(apiError);
     }
