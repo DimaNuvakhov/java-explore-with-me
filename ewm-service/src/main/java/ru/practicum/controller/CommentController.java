@@ -36,10 +36,8 @@ public class CommentController {
         return commentService.getEventComments(eventId, from, size);
     }
 
-    @PatchMapping("/users/{userId}/events/{eventId}/comment")
-    public CommentDto patch(@PathVariable Integer userId,
-                            @PathVariable Integer eventId,
-                            @RequestBody CommentDto commentDto) {
+    @PatchMapping("/comment")
+    public CommentDto patch(@RequestBody CommentDto commentDto) {
         return commentService.patch(commentDto);
     }
 }

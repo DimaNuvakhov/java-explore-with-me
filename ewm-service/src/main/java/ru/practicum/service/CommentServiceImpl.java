@@ -6,9 +6,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.CommentNotFoundException;
 import ru.practicum.exception.EventNotFoundException;
+import ru.practicum.exception.InvalidAccessException;
 import ru.practicum.exception.UserNotFoundException;
 import ru.practicum.mapper.CommentMapper;
 import ru.practicum.model.Comment;
+import ru.practicum.model.Event;
+import ru.practicum.model.State;
 import ru.practicum.model.dto.CommentDto;
 import ru.practicum.repository.CommentRepository;
 import ru.practicum.repository.EventRepository;
@@ -27,18 +30,21 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
 
     @Autowired
-    public CommentServiceImpl(CommentRepository commentRepository, EventRepository eventRepository, UserRepository userRepository) {
+    public CommentServiceImpl(CommentRepository commentRepository, EventRepository eventRepository,
+                              UserRepository userRepository) {
         this.commentRepository = commentRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
     }
 
     public CommentDto post(Integer userId, Integer eventId, CommentDto commentDto) {
-        if (userRepository.existsById(userId)) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User with id " + userId + " was not found.");
         }
-        if (eventRepository.existsById(eventId)) {
-            throw new EventNotFoundException("Event with id " + eventId + " was not found.");
+        Event foundedEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+        if (!foundedEvent.getState().equals(State.PUBLISHED.toString())) {
+            throw new InvalidAccessException("Only published events can be commented");
         }
         commentDto.setCreatedOn(LocalDateTime.now());
         commentDto.setUserId(userId);
@@ -47,10 +53,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     public List<CommentDto> getEventComments(Integer eventId, Integer from, Integer size) {
-        if (eventRepository.existsById(eventId)) {
+        if (!eventRepository.existsById(eventId)) {
             throw new EventNotFoundException("Event with id " + eventId + " was not found.");
         }
-        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("created_on"));
+        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("createdOn").descending());
         return commentRepository.findAllByEventId(eventId, pageRequest).stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
