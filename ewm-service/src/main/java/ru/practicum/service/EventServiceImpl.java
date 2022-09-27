@@ -49,7 +49,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto post(NewEventDto newEventDto, Integer userId) {
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new IllegalDateException("Date and time for which the event is scheduled cannot be earlier" +
-                    " than two hours from the current moment"); // TODO Нужна помощь
+                    " than two hours from the current moment");
         }
         Event newEvent = EventMapper.toEventFromNewEventDto(newEventDto);
         User initiator = userRepository.findById(userId)

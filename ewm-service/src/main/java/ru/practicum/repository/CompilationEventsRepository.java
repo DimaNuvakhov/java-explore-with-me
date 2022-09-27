@@ -11,7 +11,7 @@ import java.util.List;
 public interface CompilationEventsRepository extends JpaRepository<CompilationEvents, Integer> {
 
     @Query(value = "SELECT event_id FROM compilations_events WHERE compilation_id = ?1 ORDER BY event_id", nativeQuery = true)
-    List<Integer> findEventIdsWhereCompilationIdIs(Integer compId); // TODO тут переделать с нативного
+    List<Integer> findEventIdsWhereCompilationIdIs(Integer compId);
 
     Boolean existsByCompilationIdAndEventId(Integer compId, Integer eventId);
 
