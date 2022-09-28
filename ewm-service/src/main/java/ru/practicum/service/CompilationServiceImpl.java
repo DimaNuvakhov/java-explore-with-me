@@ -84,6 +84,10 @@ public class CompilationServiceImpl implements CompilationService {
         if (!compilationRepository.existsById(compId)) {
             throw new CompilationNotFoundException("Compilation with id " + compId + " was not found.");
         }
+        if (compilationEventsRepository.existsByCompilationIdAndEventId(compId, eventId)) {
+            throw new CompilationEventsNotFoundException(
+                    "Compilation with id " + compId + " has already contained an event with id " + eventId + ".");
+        }
         compilationEventsRepository.save(new CompilationEvents(null, compId, eventId));
     }
 

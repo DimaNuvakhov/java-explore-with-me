@@ -5,6 +5,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 @Table(name = "users")
 @Entity
@@ -17,10 +19,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank
+    @NotEmpty
     private String name;
-
+    @Column(nullable = false, unique = true)
     private String email;
-
 
     public User(Integer id, String name, String email) {
         this.id = id;

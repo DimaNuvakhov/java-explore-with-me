@@ -46,7 +46,6 @@ public class EventController {
                 from, size, request.getRemoteAddr(), request.getRequestURI());
     }
 
-
     //Private
 
     @PostMapping("/users/{userId}/events")
@@ -73,7 +72,7 @@ public class EventController {
 
     @PatchMapping("/users/{userId}/events")
     public EventFullDto updateEventByUser(@PathVariable Integer userId,
-                                          @RequestBody UpdateEventRequest updateEventRequest) {
+                                          @RequestBody @Valid UpdateEventRequest updateEventRequest) {
         return eventService.updateEventByUser(userId, updateEventRequest);
     }
 
@@ -106,6 +105,4 @@ public class EventController {
     ) {
         return eventService.getEventsByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
-
-
 }
