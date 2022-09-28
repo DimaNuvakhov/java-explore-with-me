@@ -7,17 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.model.EndpointHit;
-import ru.practicum.model.ViewStats;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 @Service
 public class EventClient extends BaseClient {
 
     @Autowired
-    public EventClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public EventClient(@Value("http://localhost:9090") String serverUrl, RestTemplateBuilder builder) {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))

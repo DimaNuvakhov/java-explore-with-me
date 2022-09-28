@@ -34,6 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategory(categoryDto)));
 
     }
+
     @Override
     public List<CategoryDto> getAll(Integer from, Integer size) {
         PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("id"));
@@ -41,6 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(CategoryMapper::toCategoryDto)
                 .collect(Collectors.toList());
     }
+
     @Override
     public void deleteById(Integer catId) {
         if (!categoryRepository.existsById(catId)) {

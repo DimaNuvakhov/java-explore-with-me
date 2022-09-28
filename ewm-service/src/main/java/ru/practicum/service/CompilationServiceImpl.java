@@ -52,8 +52,8 @@ public class CompilationServiceImpl implements CompilationService {
 
 
     public CompilationDto post(NewCompilationDto newCompilationDto) {
-        CompilationDto compilationDto = CompilationMapper.toCompilationDto(compilationRepository.
-                save(CompilationMapper.toCompilation(newCompilationDto)));
+        CompilationDto compilationDto = CompilationMapper.toCompilationDto(compilationRepository
+                .save(CompilationMapper.toCompilation(newCompilationDto)));
         for (Integer eventId : newCompilationDto.getEvents()) {
             if (!eventRepository.existsById(eventId)) {
                 throw new EventNotFoundException("Event with id " + eventId + " was not found.");
