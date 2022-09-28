@@ -140,7 +140,7 @@ public class CompilationServiceImpl implements CompilationService {
             EventShortDto eventShortDto = EventMapper.toEventShortDto(eventRepository.findById(eventId)
                     .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found.")));
             eventShortDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
-                    eventId, Status.APPROVED.toString()).size());
+                    eventId, Status.CONFIRMED.toString()).size());
             String uri = "/events/" + eventShortDto.getId();
             eventShortDto.setViews(Library.getViews(uri, eventRepository, eventClient));
             events.add(eventShortDto);
