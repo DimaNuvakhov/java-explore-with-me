@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class ViewStats {
 
-    String app;
+    private String app;
 
-    String uri;
+    private String uri;
 
-    Integer hits;
+    private Integer hits;
 
     public ViewStats(String app, String uri, Integer hits) {
         this.app = app;

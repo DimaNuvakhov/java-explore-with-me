@@ -1,6 +1,6 @@
 package ru.practicum.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class EventServiceImpl implements EventService {
 
@@ -34,17 +35,6 @@ public class EventServiceImpl implements EventService {
     private final EventClient eventClient;
 
     private final ParticipationRequestRepository requestRepository;
-
-    @Autowired
-    public EventServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
-                            LocationRepository locationRepository, EventRepository eventRepository, EventClient eventClient, ParticipationRequestRepository requestRepository) {
-        this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
-        this.locationRepository = locationRepository;
-        this.eventRepository = eventRepository;
-        this.eventClient = eventClient;
-        this.requestRepository = requestRepository;
-    }
 
     public EventFullDto post(NewEventDto newEventDto, Integer userId) {
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {

@@ -1,6 +1,6 @@
 package ru.practicum.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CompilationServiceImpl implements CompilationService {
 
@@ -40,16 +41,6 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventClient eventClient;
 
     private final ParticipationRequestRepository requestRepository;
-
-    @Autowired
-    public CompilationServiceImpl(CompilationRepository compilationRepository, CompilationEventsRepository compilationEventsRepository, EventRepository eventRepository, EventClient eventClient, ParticipationRequestRepository requestRepository) {
-        this.compilationRepository = compilationRepository;
-        this.compilationEventsRepository = compilationEventsRepository;
-        this.eventRepository = eventRepository;
-        this.eventClient = eventClient;
-        this.requestRepository = requestRepository;
-    }
-
 
     public CompilationDto post(NewCompilationDto newCompilationDto) {
         CompilationDto compilationDto = CompilationMapper.toCompilationDto(compilationRepository

@@ -1,5 +1,6 @@
 package ru.practicum.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -17,15 +18,11 @@ import java.util.List;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping()
 public class EventController {
 
     private final EventService eventService;
-
-    @Autowired
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
-    }
 
     // Public
     @GetMapping("/events/{eventId}")

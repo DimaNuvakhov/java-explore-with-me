@@ -13,15 +13,15 @@ import java.time.LocalDateTime;
 public class EndpointHit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    private Integer id;
 
-    String app;
+    private String app;
 
-    String uri;
+    private String uri;
 
-    String ip;
+    private String ip;
 
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 
     public EndpointHit(Integer id, String app, String uri, String ip, LocalDateTime timestamp) {
         this.id = id;

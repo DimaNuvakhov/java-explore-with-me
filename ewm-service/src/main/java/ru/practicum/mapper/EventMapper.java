@@ -1,5 +1,7 @@
 package ru.practicum.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.model.Event;
 import ru.practicum.model.State;
 import ru.practicum.model.dto.AdminUpdateEventRequest;
@@ -8,9 +10,8 @@ import ru.practicum.model.dto.EventShortDto;
 import ru.practicum.model.dto.NewEventDto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventMapper {
 
     public static Event toEventFromNewEventDto(NewEventDto newEventDto) {
@@ -48,13 +49,4 @@ public class EventMapper {
                 event.getPaid(), event.getTitle(), null
         );
     }
-
-    public static List<EventFullDto> toEventFullDtoList(List<Event> events) {
-        List<EventFullDto> eventFullDtos = new ArrayList<>();
-        for (Event event : events) {
-            eventFullDtos.add(toEventFullDto(event));
-        }
-        return eventFullDtos;
-    }
-
 }

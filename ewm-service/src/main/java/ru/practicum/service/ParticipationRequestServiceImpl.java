@@ -1,5 +1,6 @@
 package ru.practicum.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.*;
 import ru.practicum.exception.IllegalStateException;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
 
@@ -23,12 +25,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     private final UserRepository userRepository;
 
     private final EventRepository eventRepository;
-
-    public ParticipationRequestServiceImpl(ParticipationRequestRepository requestRepository, UserRepository userRepository, EventRepository eventRepository) {
-        this.requestRepository = requestRepository;
-        this.userRepository = userRepository;
-        this.eventRepository = eventRepository;
-    }
 
     public ParticipationRequestDto post(Integer userId, Integer eventId) {
         if (requestRepository.existsByRequesterAndAndEvent(userId, eventId)) {
@@ -78,7 +74,9 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new IllegalIdException(
                     "User with id " + userId + " is not the initiator of the event with id " + eventId);
         }
-        return ParticipationRequestMapper.toRequestDtoList(requestRepository.findAllByEvent(foundedEvent.getId()));
+        return requestRepository.findAllByEvent(foundedEvent.getId()).stream()
+                .map(ParticipationRequestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     public ParticipationRequestDto cancelUserRequest(Integer userId, Integer reqId) {

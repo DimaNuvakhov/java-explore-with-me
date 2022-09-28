@@ -1,5 +1,6 @@
 package ru.practicum.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +14,11 @@ import java.util.Collection;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping()
 public class CategoryController {
 
     private final CategoryService categoryService;
-
-    @Autowired
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
 
     @GetMapping("/categories")
     public Collection<CategoryDto> getAll(@PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
