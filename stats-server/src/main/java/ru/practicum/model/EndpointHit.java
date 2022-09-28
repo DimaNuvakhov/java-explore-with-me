@@ -6,7 +6,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Table(name="endpoint_hits")
+@Table(name = "endpoint_hits")
 @Entity
 @Getter
 @Setter

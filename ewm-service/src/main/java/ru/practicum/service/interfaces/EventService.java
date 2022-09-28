@@ -1,6 +1,5 @@
 package ru.practicum.service.interfaces;
 
-import ru.practicum.model.State;
 import ru.practicum.model.dto.*;
 
 import java.time.LocalDateTime;
