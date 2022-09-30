@@ -1,6 +1,6 @@
 package ru.practicum.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.dto.ParticipationRequestDto;
@@ -10,15 +10,11 @@ import java.util.Collection;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping()
 public class ParticipationRequestController {
 
     private final ParticipationRequestService participationRequestService;
-
-    @Autowired
-    public ParticipationRequestController(ParticipationRequestService participationRequestService) {
-        this.participationRequestService = participationRequestService;
-    }
 
     @PostMapping("/users/{userId}/requests")
     public ParticipationRequestDto post(@PathVariable Integer userId,

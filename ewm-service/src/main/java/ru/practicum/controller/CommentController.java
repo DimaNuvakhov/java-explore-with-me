@@ -1,6 +1,6 @@
 package ru.practicum.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.dto.CommentDto;
@@ -12,15 +12,11 @@ import java.util.Collection;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping()
 public class CommentController {
 
     private final CommentService commentService;
-
-    @Autowired
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
 
     @PostMapping("/users/{userId}/events/{eventId}/comment")
     public CommentDto post(@PathVariable Integer userId,

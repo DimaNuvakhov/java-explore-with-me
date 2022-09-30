@@ -1,11 +1,11 @@
 package ru.practicum.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.model.Category;
 import ru.practicum.model.dto.CategoryDto;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CategoryMapper {
 
     public static CategoryDto toCategoryDto(Category category) {
@@ -14,14 +14,6 @@ public class CategoryMapper {
 
     public static Category toCategory(CategoryDto categoryDto) {
         return new Category(categoryDto.getId(), categoryDto.getName());
-    }
-
-    public static List<CategoryDto> toCategoryDtoList(List<Category> categories) {
-        List<CategoryDto> categoryDtos = new ArrayList<>();
-        for (Category category : categories) {
-            categoryDtos.add(toCategoryDto(category));
-        }
-        return categoryDtos;
     }
 }
 

@@ -1,6 +1,6 @@
 package ru.practicum.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.dto.CompilationDto;
@@ -14,15 +14,11 @@ import java.util.Collection;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping()
 public class CompilationController {
 
     private final CompilationService compilationService;
-
-    @Autowired
-    public CompilationController(CompilationService compilationService) {
-        this.compilationService = compilationService;
-    }
 
     // Public
 

@@ -20,7 +20,7 @@ public class Event {
 
     private String annotation;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
@@ -32,20 +32,21 @@ public class Event {
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "initiator_id", nullable = false)
     private User initiator;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
+    @Column(nullable = false)
     private Boolean paid;
 
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
 
-    @Column(name = "published_on", nullable = true)
+    @Column(name = "published_on")
     private LocalDateTime publishedOn;
 
     @Column(name = "request_moderation", nullable = false)

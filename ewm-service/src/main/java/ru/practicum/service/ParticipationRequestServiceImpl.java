@@ -1,5 +1,6 @@
 package ru.practicum.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.*;
 import ru.practicum.exception.IllegalStateException;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
 
@@ -23,12 +25,6 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     private final UserRepository userRepository;
 
     private final EventRepository eventRepository;
-
-    public ParticipationRequestServiceImpl(ParticipationRequestRepository requestRepository, UserRepository userRepository, EventRepository eventRepository) {
-        this.requestRepository = requestRepository;
-        this.userRepository = userRepository;
-        this.eventRepository = eventRepository;
-    }
 
     public ParticipationRequestDto post(Integer userId, Integer eventId) {
         if (requestRepository.existsByRequesterAndAndEvent(userId, eventId)) {
@@ -48,12 +44,12 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new IllegalStateException("Only a published event can accept participation requests.");
         }
         Integer confirmedRequests = requestRepository
-                .findAllByEventAndStatusIs(foundedEvent.getId(), Status.APPROVED.toString()).size();
+                .findAllByEventAndStatusIs(foundedEvent.getId(), Status.CONFIRMED.toString()).size();
         if (foundedEvent.getParticipantLimit().equals(confirmedRequests)) {
             throw new ParticipantLimitException("Limit of requests for participation has been reached");
         }
         if (!foundedEvent.getRequestModeration()) {
-            request.setStatus(Status.APPROVED.toString());
+            request.setStatus(Status.CONFIRMED.toString());
         }
         request.setStatus(Status.PENDING.toString());
         request.setEvent(foundedEvent.getId());
@@ -78,7 +74,9 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new IllegalIdException(
                     "User with id " + userId + " is not the initiator of the event with id " + eventId);
         }
-        return ParticipationRequestMapper.toRequestDtoList(requestRepository.findAllByEvent(foundedEvent.getId()));
+        return requestRepository.findAllByEvent(foundedEvent.getId()).stream()
+                .map(ParticipationRequestMapper::toParticipationRequestDto)
+                .collect(Collectors.toList());
     }
 
     public ParticipationRequestDto cancelUserRequest(Integer userId, Integer reqId) {
@@ -92,7 +90,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new InvalidAccessException(
                     "User with id " + userId + " is not the requester of the request with id " + reqId);
         }
-        request.setStatus(Status.REJECTED.toString());
+        request.setStatus(Status.CANCELED.toString());
         return ParticipationRequestMapper
                 .toParticipationRequestDto(requestRepository.save(request));
     }
@@ -114,15 +112,15 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new InvalidAccessException("User can not participate in his own event");
         }
         if (foundedEvent.getParticipantLimit() == 0 || !foundedEvent.getRequestModeration()) {
-            foundedParticipationRequest.setStatus(Status.APPROVED.toString());
+            foundedParticipationRequest.setStatus(Status.CONFIRMED.toString());
         }
         Integer confirmedRequestsNumber = requestRepository
-                .findAllByEventAndStatusIs(eventId, Status.APPROVED.toString()).size();
+                .findAllByEventAndStatusIs(eventId, Status.CONFIRMED.toString()).size();
         if (foundedEvent.getParticipantLimit().equals(confirmedRequestsNumber)) {
             foundedParticipationRequest.setStatus(Status.REJECTED.toString());
             requestRepository.save(foundedParticipationRequest);
         }
-        foundedParticipationRequest.setStatus(Status.APPROVED.toString());
+        foundedParticipationRequest.setStatus(Status.CONFIRMED.toString());
         requestRepository.save(foundedParticipationRequest);
         if (foundedEvent.getParticipantLimit().equals(confirmedRequestsNumber)) {
             List<ParticipationRequest> participationRequestList = requestRepository

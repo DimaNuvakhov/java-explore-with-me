@@ -1,16 +1,14 @@
 package ru.practicum.controller;
 
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.exception.*;
 import ru.practicum.exception.IllegalStateException;
 import ru.practicum.model.ApiError;
@@ -18,14 +16,49 @@ import ru.practicum.model.ApiError;
 import java.util.Arrays;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+@RestControllerAdvice
+public class RestExceptionHandler {
 
-    @Override
-    protected ResponseEntity<Object> handleHttpMessageNotReadable(
-            HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String error = "Malformed JSON request";
-        return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
+    @ExceptionHandler(Throwable.class)
+    protected ResponseEntity<Object> handleThrowable(Throwable ex) {
+        ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR);
+        apiError.setMessage(ex.getMessage());
+        String reason = "Internal server error.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
+        apiError.setReason(reason);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(ex.getMessage());
+        String reason = "For the requested operation the conditions are not met.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
+        apiError.setReason(reason);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(ex.getMessage());
+        String reason = "For the requested operation the conditions are not met.";
+        if (Arrays.stream(ex.getStackTrace()).findFirst().isPresent()) {
+            apiError.setErrors(Arrays.stream(ex.getStackTrace()).findFirst().get().toString());
+        } else {
+            apiError.setErrors(null);
+        }
+        apiError.setReason(reason);
+        return buildResponseEntity(apiError);
     }
 
     @ExceptionHandler(UserNotFoundException.class)

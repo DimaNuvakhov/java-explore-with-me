@@ -1,6 +1,6 @@
 package ru.practicum.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,20 +22,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
-
-    @Autowired
-    public CommentServiceImpl(CommentRepository commentRepository, EventRepository eventRepository,
-                              UserRepository userRepository) {
-        this.commentRepository = commentRepository;
-        this.eventRepository = eventRepository;
-        this.userRepository = userRepository;
-    }
 
     public CommentDto post(Integer userId, Integer eventId, CommentDto commentDto) {
         if (!userRepository.existsById(userId)) {

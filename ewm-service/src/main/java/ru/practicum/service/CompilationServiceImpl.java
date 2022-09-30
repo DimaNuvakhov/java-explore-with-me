@@ -1,6 +1,6 @@
 package ru.practicum.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CompilationServiceImpl implements CompilationService {
 
@@ -40,16 +41,6 @@ public class CompilationServiceImpl implements CompilationService {
     private final EventClient eventClient;
 
     private final ParticipationRequestRepository requestRepository;
-
-    @Autowired
-    public CompilationServiceImpl(CompilationRepository compilationRepository, CompilationEventsRepository compilationEventsRepository, EventRepository eventRepository, EventClient eventClient, ParticipationRequestRepository requestRepository) {
-        this.compilationRepository = compilationRepository;
-        this.compilationEventsRepository = compilationEventsRepository;
-        this.eventRepository = eventRepository;
-        this.eventClient = eventClient;
-        this.requestRepository = requestRepository;
-    }
-
 
     public CompilationDto post(NewCompilationDto newCompilationDto) {
         CompilationDto compilationDto = CompilationMapper.toCompilationDto(compilationRepository
@@ -92,6 +83,10 @@ public class CompilationServiceImpl implements CompilationService {
         }
         if (!compilationRepository.existsById(compId)) {
             throw new CompilationNotFoundException("Compilation with id " + compId + " was not found.");
+        }
+        if (compilationEventsRepository.existsByCompilationIdAndEventId(compId, eventId)) {
+            throw new CompilationEventsNotFoundException(
+                    "Compilation with id " + compId + " has already contained an event with id " + eventId + ".");
         }
         compilationEventsRepository.save(new CompilationEvents(null, compId, eventId));
     }
@@ -145,7 +140,7 @@ public class CompilationServiceImpl implements CompilationService {
             EventShortDto eventShortDto = EventMapper.toEventShortDto(eventRepository.findById(eventId)
                     .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found.")));
             eventShortDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
-                    eventId, Status.APPROVED.toString()).size());
+                    eventId, Status.CONFIRMED.toString()).size());
             String uri = "/events/" + eventShortDto.getId();
             eventShortDto.setViews(Library.getViews(uri, eventRepository, eventClient));
             events.add(eventShortDto);

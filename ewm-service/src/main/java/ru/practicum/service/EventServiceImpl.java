@@ -1,6 +1,6 @@
 package ru.practicum.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class EventServiceImpl implements EventService {
 
@@ -35,16 +36,6 @@ public class EventServiceImpl implements EventService {
 
     private final ParticipationRequestRepository requestRepository;
 
-    @Autowired
-    public EventServiceImpl(CategoryRepository categoryRepository, UserRepository userRepository,
-                            LocationRepository locationRepository, EventRepository eventRepository, EventClient eventClient, ParticipationRequestRepository requestRepository) {
-        this.categoryRepository = categoryRepository;
-        this.userRepository = userRepository;
-        this.locationRepository = locationRepository;
-        this.eventRepository = eventRepository;
-        this.eventClient = eventClient;
-        this.requestRepository = requestRepository;
-    }
 
     public EventFullDto post(NewEventDto newEventDto, Integer userId) {
         if (newEventDto.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
@@ -93,7 +84,7 @@ public class EventServiceImpl implements EventService {
         foundedEvent.setPublishedOn(publishedDate);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
         eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
-                eventId, Status.APPROVED.toString()).size());
+                eventId, Status.CONFIRMED.toString()).size());
         String uri = "/events/" + eventId;
         eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         return eventFullDto;
@@ -108,7 +99,7 @@ public class EventServiceImpl implements EventService {
         foundedEvent.setState(State.CANCELED.toString());
         EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
         eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
-                eventId, Status.APPROVED.toString()).size());
+                eventId, Status.CONFIRMED.toString()).size());
         String uri = "/events/" + eventId;
         eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         return eventFullDto;
@@ -125,7 +116,7 @@ public class EventServiceImpl implements EventService {
         eventClient.postRequest(new EndpointHit(null, "ewn", uri, ip, LocalDateTime.now()));
         // Получаем все подтвержденные запрос и заполняем поле
         eventDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
-                eventId, Status.APPROVED.toString()).size());
+                eventId, Status.CONFIRMED.toString()).size());
         eventDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         return eventDto;
     }
@@ -139,7 +130,7 @@ public class EventServiceImpl implements EventService {
                 .map(EventMapper::toEventShortDto).collect(Collectors.toList());
         for (EventShortDto eventShortDto : eventShortDtoList) {
             eventShortDto.setConfirmedRequests(requestRepository
-                    .findAllByEventAndStatusIs(eventShortDto.getId(), Status.APPROVED.toString()).size());
+                    .findAllByEventAndStatusIs(eventShortDto.getId(), Status.CONFIRMED.toString()).size());
             String uri = "/events/" + eventShortDto.getId();
             eventShortDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         }
@@ -158,7 +149,7 @@ public class EventServiceImpl implements EventService {
         }
         EventFullDto eventFullDto = EventMapper.toEventFullDto(foundedEvent);
         eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
-                eventId, Status.APPROVED.toString()).size());
+                eventId, Status.CONFIRMED.toString()).size());
         String uri = "/events/" + eventId;
         eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
         return eventFullDto;
@@ -188,7 +179,7 @@ public class EventServiceImpl implements EventService {
         foundedEvent.setPaid(updateEventRequest.getPaid());
         foundedEvent.setParticipantLimit(updateEventRequest.getParticipantLimit());
         Integer confirmedRequestsNumber = requestRepository
-                .findAllByEventAndStatusIs(foundedEvent.getId(), Status.APPROVED.toString()).size();
+                .findAllByEventAndStatusIs(foundedEvent.getId(), Status.CONFIRMED.toString()).size();
         if (foundedEvent.getParticipantLimit() < confirmedRequestsNumber) {
             throw new InvalidAccessException("The value in the updated \"participantLimit\" field cannot be less" +
                     " than confirmed requests of the event");
@@ -210,7 +201,7 @@ public class EventServiceImpl implements EventService {
         Event updatedEvent = EventMapper.toEventFromAdminUpdateEventRequest(adminUpdateEventRequest);
 
         Integer confirmedRequestsNumber = requestRepository
-                .findAllByEventAndStatusIs(eventId, Status.APPROVED.toString()).size();
+                .findAllByEventAndStatusIs(eventId, Status.CONFIRMED.toString()).size();
         // Я не мог этого не провалидировать
         if (updatedEvent.getParticipantLimit() < confirmedRequestsNumber) {
             throw new InvalidAccessException("The value in the updated \"participantLimit\" field cannot be less" +
@@ -242,7 +233,7 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
         for (EventFullDto eventFullDto : foundedEvents) {
             Integer confirmedRequestsNumber = requestRepository
-                    .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
+                    .findAllByEventAndStatusIs(eventFullDto.getId(), Status.CONFIRMED.toString()).size();
             eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
             String uri = "/events/" + eventFullDto.getId();
             eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));
@@ -271,7 +262,7 @@ public class EventServiceImpl implements EventService {
         if (onlyAvailable) {
             for (EventFullDto eventFullDto : events) {
                 Integer confirmedRequestsNumber = requestRepository
-                        .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
+                        .findAllByEventAndStatusIs(eventFullDto.getId(), Status.CONFIRMED.toString()).size();
                 if (eventFullDto.getParticipantLimit().equals(confirmedRequestsNumber)) {
                     events.remove(eventFullDto);
                 }
@@ -279,7 +270,7 @@ public class EventServiceImpl implements EventService {
         }
         for (EventFullDto eventFullDto : events) {
             Integer confirmedRequestsNumber = requestRepository
-                    .findAllByEventAndStatusIs(eventFullDto.getId(), Status.APPROVED.toString()).size();
+                    .findAllByEventAndStatusIs(eventFullDto.getId(), Status.CONFIRMED.toString()).size();
             eventFullDto.setConfirmedRequests(confirmedRequestsNumber);
             String uri = "/events/" + eventFullDto.getId();
             eventFullDto.setViews(Library.getViews(uri, eventRepository, eventClient));

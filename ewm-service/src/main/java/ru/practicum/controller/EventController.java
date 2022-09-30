@@ -1,6 +1,6 @@
 package ru.practicum.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +17,11 @@ import java.util.List;
 
 @Validated
 @RestController
+@RequiredArgsConstructor
 @RequestMapping()
 public class EventController {
 
     private final EventService eventService;
-
-    @Autowired
-    public EventController(EventService eventService) {
-        this.eventService = eventService;
-    }
 
     // Public
     @GetMapping("/events/{eventId}")
@@ -38,8 +34,8 @@ public class EventController {
             @RequestParam String text,
             @RequestParam List<Integer> categories,
             @RequestParam Boolean paid,
-            @RequestParam(required = false) @DateTimeFormat (iso = DateTimeFormat.ISO.DATE_TIME)  LocalDateTime rangeStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @RequestParam Boolean onlyAvailable,
             @RequestParam String sort,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
@@ -51,7 +47,6 @@ public class EventController {
 
 
     //Private
-
     @PostMapping("/users/{userId}/events")
     public EventFullDto post(@RequestBody @Valid NewEventDto newEventDto, @PathVariable Integer userId) {
         return eventService.post(newEventDto, userId);
@@ -76,7 +71,7 @@ public class EventController {
 
     @PatchMapping("/users/{userId}/events")
     public EventFullDto updateEventByUser(@PathVariable Integer userId,
-                                          @RequestBody UpdateEventRequest updateEventRequest) {
+                                          @RequestBody @Valid UpdateEventRequest updateEventRequest) {
         return eventService.updateEventByUser(userId, updateEventRequest);
     }
 
@@ -102,13 +97,11 @@ public class EventController {
             @RequestParam List<Integer> users,
             @RequestParam List<String> states,
             @RequestParam List<Integer> categories,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeStart,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime rangeEnd,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "10") Integer size
     ) {
         return eventService.getEventsByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
-
-
 }
