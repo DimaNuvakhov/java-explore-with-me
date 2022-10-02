@@ -19,10 +19,10 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/users/{userId}/events/{eventId}/comment")
-    public CommentDto post(@PathVariable Integer userId,
+    public CommentDto postComment(@PathVariable Integer userId,
                            @PathVariable Integer eventId,
                            @RequestBody CommentDto commentDto) {
-        return commentService.post(userId, eventId, commentDto);
+        return commentService.postComment(userId, eventId, commentDto);
     }
 
     @GetMapping("/events/{eventId}/comment")
@@ -33,7 +33,7 @@ public class CommentController {
     }
 
     @PatchMapping("/comment")
-    public CommentDto patch(@RequestBody CommentDto commentDto) {
-        return commentService.patch(commentDto);
+    public CommentDto updateComment(@RequestBody CommentDto commentDto) {
+        return commentService.updateComment(commentDto);
     }
 }

@@ -62,10 +62,10 @@ public class EventServiceImpl implements EventService {
             throw new IllegalIdException(
                     "User with id " + userId + " is not the initiator of the event with id " + eventId);
         }
-        if (!foundedEvent.getState().equals(State.PENDING.toString())) {
+        if (!foundedEvent.getState().equals(State.PENDING)) {
             throw new IllegalStateException("Only pending events can be canceled");
         }
-        foundedEvent.setState(State.CANCELED.toString());
+        foundedEvent.setState(State.CANCELED);
         return EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
     }
 
@@ -77,10 +77,10 @@ public class EventServiceImpl implements EventService {
             throw new InvalidAccessException("The start date of the event must be no earlier than one hour " +
                     "from the date of publication");
         }
-        if (!foundedEvent.getState().equals(State.PENDING.toString())) {
+        if (!foundedEvent.getState().equals(State.PENDING)) {
             throw new IllegalStateException("Only pending events can be published");
         }
-        foundedEvent.setState(State.PUBLISHED.toString());
+        foundedEvent.setState(State.PUBLISHED);
         foundedEvent.setPublishedOn(publishedDate);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
         eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
@@ -93,10 +93,10 @@ public class EventServiceImpl implements EventService {
     public EventFullDto rejectEvent(Integer eventId) {
         Event foundedEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
-        if (!foundedEvent.getState().equals(State.PENDING.toString())) {
+        if (!foundedEvent.getState().equals(State.PENDING)) {
             throw new IllegalStateException("Only pending events can be canceled");
         }
-        foundedEvent.setState(State.CANCELED.toString());
+        foundedEvent.setState(State.CANCELED);
         EventFullDto eventFullDto = EventMapper.toEventFullDto(eventRepository.save(foundedEvent));
         eventFullDto.setConfirmedRequests(requestRepository.findAllByEventAndStatusIs(
                 eventId, Status.CONFIRMED.toString()).size());
@@ -109,7 +109,7 @@ public class EventServiceImpl implements EventService {
         Event foundedEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
         EventFullDto eventDto = EventMapper.toEventFullDto(foundedEvent);
-        if (!eventDto.getState().equals(State.PUBLISHED.toString())) {
+        if (!eventDto.getState().equals(State.PUBLISHED)) {
             throw new IllegalStateException("Only published events can be viewed");
         }
         // Сохранение в сервис статистики
@@ -162,11 +162,11 @@ public class EventServiceImpl implements EventService {
         Category foundedCategory = categoryRepository.findById(updateEventRequest.getCategory())
                 .orElseThrow(() -> new CategoryNotFoundException(
                         "Category with id " + updateEventRequest.getCategory() + " was not found."));
-        if (foundedEvent.getState().equals(State.PUBLISHED.toString())) {
+        if (foundedEvent.getState().equals(State.PUBLISHED)) {
             throw new InvalidAccessException("To cancel an event, the status must be either PENDING or CANCELED");
         }
-        if (foundedEvent.getState().equals(State.CANCELED.toString())) {
-            foundedEvent.setState(State.PENDING.toString());
+        if (foundedEvent.getState().equals(State.CANCELED)) {
+            foundedEvent.setState(State.PENDING);
         }
         if (updateEventRequest.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
             throw new IllegalDateException("Date and time for which the event is scheduled cannot be earlier" +

@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface CommentService {
 
-    CommentDto post(Integer userId, Integer eventId, CommentDto commentDto);
+    CommentDto postComment(Integer userId, Integer eventId, CommentDto commentDto);
 
     List<CommentDto> getEventComments(Integer eventId, Integer from, Integer size);
 
-    CommentDto patch(CommentDto commentDto);
+    CommentDto updateComment(CommentDto commentDto);
 }

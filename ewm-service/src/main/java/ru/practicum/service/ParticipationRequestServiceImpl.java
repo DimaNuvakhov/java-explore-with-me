@@ -40,7 +40,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         if (foundedEvent.getInitiator().getId().equals(requester.getId())) {
             throw new InvalidAccessException("Initiator of the event cannot add a request to participate in his event.");
         }
-        if (!foundedEvent.getState().equals(State.PUBLISHED.toString())) {
+        if (!foundedEvent.getState().equals(State.PUBLISHED)) {
             throw new IllegalStateException("Only a published event can accept participation requests.");
         }
         Integer confirmedRequests = requestRepository

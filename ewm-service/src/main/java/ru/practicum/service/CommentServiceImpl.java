@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.exception.CommentNotFoundException;
-import ru.practicum.exception.EventNotFoundException;
-import ru.practicum.exception.InvalidAccessException;
-import ru.practicum.exception.UserNotFoundException;
+import ru.practicum.exception.*;
 import ru.practicum.mapper.CommentMapper;
 import ru.practicum.model.Comment;
 import ru.practicum.model.Event;
@@ -30,13 +27,13 @@ public class CommentServiceImpl implements CommentService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
 
-    public CommentDto post(Integer userId, Integer eventId, CommentDto commentDto) {
+    public CommentDto postComment(Integer userId, Integer eventId, CommentDto commentDto) {
         if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User with id " + userId + " was not found.");
+            throw new NotFoundException("User with id " + userId + " was not found.");
         }
         Event foundedEvent = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
-        if (!foundedEvent.getState().equals(State.PUBLISHED.toString())) {
+                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " was not found."));
+        if (!foundedEvent.getState().equals(State.PUBLISHED)) {
             throw new InvalidAccessException("Only published events can be commented");
         }
         commentDto.setCreatedOn(LocalDateTime.now());
@@ -47,17 +44,17 @@ public class CommentServiceImpl implements CommentService {
 
     public List<CommentDto> getEventComments(Integer eventId, Integer from, Integer size) {
         if (!eventRepository.existsById(eventId)) {
-            throw new EventNotFoundException("Event with id " + eventId + " was not found.");
+            throw new NotFoundException("Event with id " + eventId + " was not found.");
         }
-        PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("createdOn").descending());
+        PageRequest pageRequest = PageRequest.of(from, size, Sort.by("createdOn").descending());
         return commentRepository.findAllByEventId(eventId, pageRequest).stream()
                 .map(CommentMapper::toCommentDto)
                 .collect(Collectors.toList());
     }
 
-    public CommentDto patch(CommentDto commentDto) {
+    public CommentDto updateComment(CommentDto commentDto) {
         Comment foundedComment = commentRepository.findById(commentDto.getId())
-                .orElseThrow(() -> new CommentNotFoundException("Comment with id " + commentDto.getId() +
+                .orElseThrow(() -> new NotFoundException("Comment with id " + commentDto.getId() +
                         " was not found."));
         if (commentDto.getText() != null) {
             foundedComment.setText(commentDto.getText());

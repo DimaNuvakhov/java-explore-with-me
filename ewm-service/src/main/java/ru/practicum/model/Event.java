@@ -52,13 +52,15 @@ public class Event {
     @Column(name = "request_moderation", nullable = false)
     private Boolean requestModeration;
 
-    private String state;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private State state;
 
     private String title;
 
     public Event(Integer id, String annotation, Category category, LocalDateTime createdOn, String description,
                  LocalDateTime eventDate, User initiator, Location location, Boolean paid, Integer participantLimit,
-                 LocalDateTime publishedOn, Boolean requestModeration, String state, String title) {
+                 LocalDateTime publishedOn, Boolean requestModeration, State state, String title) {
         this.id = id;
         this.annotation = annotation;
         this.category = category;

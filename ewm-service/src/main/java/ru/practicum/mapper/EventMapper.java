@@ -19,7 +19,7 @@ public class EventMapper {
                 newEventDto.getDescription(), newEventDto.getEventDate(), null,
                 null, newEventDto.getPaid(),
                 newEventDto.getParticipantLimit(), null, newEventDto.getRequestModeration(),
-                State.PENDING.toString(), newEventDto.getTitle()
+                State.PENDING, newEventDto.getTitle()
         );
     }
 
