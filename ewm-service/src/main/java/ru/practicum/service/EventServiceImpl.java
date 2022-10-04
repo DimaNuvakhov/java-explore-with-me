@@ -282,4 +282,13 @@ public class EventServiceImpl implements EventService {
         }
         return events;
     }
+
+    public Event findById(Integer eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new EventNotFoundException("Event with id " + eventId + " was not found."));
+    }
+
+    public Boolean existsById(Integer eventId) {
+        return eventRepository.existsById(eventId);
+    }
 }

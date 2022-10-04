@@ -46,4 +46,8 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.deleteById(userId);
     }
+
+    public Boolean existsById(Integer userId) {
+        return userRepository.existsById(userId);
+    }
 }

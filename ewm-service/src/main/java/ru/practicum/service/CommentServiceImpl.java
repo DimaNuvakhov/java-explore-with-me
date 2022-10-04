@@ -1,6 +1,7 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -11,28 +12,25 @@ import ru.practicum.model.Event;
 import ru.practicum.model.State;
 import ru.practicum.model.dto.CommentDto;
 import ru.practicum.repository.CommentRepository;
-import ru.practicum.repository.EventRepository;
-import ru.practicum.repository.UserRepository;
 import ru.practicum.service.interfaces.CommentService;
+import ru.practicum.service.interfaces.EventService;
+import ru.practicum.service.interfaces.UserService;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-    private final EventRepository eventRepository;
-    private final UserRepository userRepository;
+    private final EventService eventService;
+    private final UserService userService;
 
     public CommentDto postComment(Integer userId, Integer eventId, CommentDto commentDto) {
-        if (!userRepository.existsById(userId)) {
+        if (!userService.existsById(userId)) {
             throw new NotFoundException("User with id " + userId + " was not found.");
         }
-        Event foundedEvent = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Event with id " + eventId + " was not found."));
+        Event foundedEvent = eventService.findById(eventId);
         if (!foundedEvent.getState().equals(State.PUBLISHED)) {
             throw new InvalidAccessException("Only published events can be commented");
         }
@@ -42,14 +40,13 @@ public class CommentServiceImpl implements CommentService {
         return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto)));
     }
 
-    public List<CommentDto> getEventComments(Integer eventId, Integer from, Integer size) {
-        if (!eventRepository.existsById(eventId)) {
+    public Page<CommentDto> getEventComments(Integer eventId, Integer from, Integer size) {
+        if (!eventService.existsById(eventId)) {
             throw new NotFoundException("Event with id " + eventId + " was not found.");
         }
         PageRequest pageRequest = PageRequest.of(from, size, Sort.by("createdOn").descending());
-        return commentRepository.findAllByEventId(eventId, pageRequest).stream()
-                .map(CommentMapper::toCommentDto)
-                .collect(Collectors.toList());
+        return commentRepository.findAllByEventId(eventId, pageRequest)
+                .map(CommentMapper::toCommentDto);
     }
 
     public CommentDto updateComment(CommentDto commentDto) {

@@ -12,4 +12,5 @@ public interface UserService {
 
     void deleteById(Integer userId);
 
+    Boolean existsById(Integer userId);
 }

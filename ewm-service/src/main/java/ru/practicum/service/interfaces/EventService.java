@@ -1,5 +1,6 @@
 package ru.practicum.service.interfaces;
 
+import ru.practicum.model.Event;
 import ru.practicum.model.dto.*;
 
 import java.time.LocalDateTime;
@@ -32,4 +33,8 @@ public interface EventService {
     List<EventFullDto> getPublicEvents(String text, List<Integer> categories, Boolean paid, LocalDateTime rangeStart,
                     LocalDateTime rangeEnd, Boolean onlyAvailable, String sort,
                     Integer from, Integer size, String ip, String uri);
+
+    Event findById(Integer eventId);
+
+    Boolean existsById(Integer eventId);
 }
