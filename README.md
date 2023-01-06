@@ -24,6 +24,6 @@
 
 #### спецификация основного сервиса: [ewm-main-service-spec.json](https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-main-service-spec.json)
 #### спецификация сервиса статистики: [ewm-stats-service.json](https://raw.githubusercontent.com/yandex-praktikum/java-explore-with-me/main/ewm-stats-service-spec.json)
-Для работы со спецификациями необходимо использовать редактор [Swagger](https://editor-next.swagger.io/).
+Для работы со спецификациями можно использовать редактор [Swagger](https://editor-next.swagger.io/).
 
 Чтобы развернуть приложение на базе докер контейнера нужно использовать команду **docker-compose up**
